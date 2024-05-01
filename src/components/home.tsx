@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { gsap, random } from "gsap";
+import Shapes from "./shapes"
 
 export default function Home() {
 
@@ -67,6 +68,7 @@ export default function Home() {
       <section className="px-4 py-10 md:px-6 md:py-14 lg:py-16">
         <div className="mx-auto w-full max-w-7xl">
           <div ref={component} className="grid min-h-[70vh] grid-cols-1 md:grid-cols-2 items-center">
+            <Shapes />
             <div className="col-start-1 md:row-start-1">
               <h1 className="mb-8 text-[clamp(3rem,12vmin,20rem)] font-extrabold leading-none tracking-tighter" aria-label={firstName + " " + lastName}>
                 <span className="block text-gray-300">{renderLetters(firstName, "first")}</span>
