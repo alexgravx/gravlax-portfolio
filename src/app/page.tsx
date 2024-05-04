@@ -1,6 +1,6 @@
 import Image from "next/image";
-import Home from "../pages/home"
-import TechList from "../components/tech-list";
+import Home from "../components/Home"
+import TechList from "../components/TechList";
 
 export default function Main() {
 

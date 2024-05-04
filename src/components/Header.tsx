@@ -14,7 +14,7 @@ export default async function Header() {
                         <Link href="/about" aria-label="Home Page">About</Link>
                     </li>
                     <li>
-                        <Link href="/home" aria-label="Home Page">Settings</Link>
+                        <Link href="/set" aria-label="Home Page">Settings</Link>
                     </li>
                 </ul>
             </nav>

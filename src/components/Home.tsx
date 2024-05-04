@@ -2,8 +2,8 @@
 
 import { useEffect, useRef } from "react";
 import { gsap, random } from "gsap";
-import Shapes from "../components/shapes"
-import Bounded from "../components/Bounded";
+import Shapes from "./Shapes"
+import Bounded from "./Bounded";
 
 export default function Home() {
 
