@@ -24,34 +24,68 @@ function Geometries() {
     const geometries = [
         {
             position: [0,0,0],
-            r: 0.3,
-            geometry: new THREE.IcosahedronGeometry(3) // Gem
+            rate: 0.3,
+            geometry: new THREE.IcosahedronGeometry(2) // Gem
         },
         {
-            position: [-2,0,2],
-            r: 0.3,
-            geometry: new THREE.TorusGeometry(1) // Gem
+            position: [2, -1.5, 8],
+            rate: 0.4,
+            geometry: new THREE.CapsuleGeometry(0.5, 1.6, 2, 16),
+        },
+        {
+            position: [-3, 4, -8],
+            rate: 0.6,
+            geometry: new THREE.DodecahedronGeometry(1.5),
+        },
+        {
+            position: [-1.5 ,-1.5 , 10],
+            rate: 0.6,
+            geometry: new THREE.TorusGeometry(0.6, 0.25, 16, 32),
+        },
+        {
+            position: [3.2 , 3.2, -8],
+            rate: 0.7,
+            geometry: new THREE.OctahedronGeometry(1.5)
         },
     ];
 
     const materials = [
-        new THREE.MeshNormalMaterial()
+        new THREE.MeshNormalMaterial(),
+        new THREE.MeshStandardMaterial({color: 0x10439F, roughness: 0}),
+        new THREE.MeshStandardMaterial({color: 0x874CCC, roughness: 0}),
+        new THREE.MeshStandardMaterial({color: 0xC65BCF, roughness: 0.2}),
+        new THREE.MeshStandardMaterial({color: 0xF27BBD, roughness: 0.2}),
+        new THREE.MeshStandardMaterial({color: 0x4D869C, roughness: 0.2}),
+        new THREE.MeshStandardMaterial({color: 0x7AB2B2, roughness: 0.2}),
+        new THREE.MeshStandardMaterial({color: 0x135D66, roughness: 0.2}),
+        new THREE.MeshStandardMaterial({color: 0xB5C18E, roughness: 0.2}),
+        new THREE.MeshStandardMaterial({color: 0xA3FFD6, roughness: 0.2}),
+        new THREE.MeshStandardMaterial({color: 0x0A6847, roughness: 0.2}),
+        new THREE.MeshStandardMaterial({color: 0x32012F, roughness: 0.2}),
+    ]
+
+    const SoundEffects = [
+        new Audio("/sounds/laser1.ogg"),
+        new Audio("/sounds/laser2.ogg"),
+        new Audio("/sounds/laser3.ogg"),
+        new Audio("/sounds/laser4.ogg"),
     ]
     
-    return geometries.map(({position, r, geometry}) => (
+    return geometries.map(({position, rate, geometry}) => (
         <Geometry 
         key={JSON.stringify(position)}
-        position={position.map((p) => p*2)}
+        position={position}
+        SoundEffects={SoundEffects}
         geometry={geometry}
         materials={materials}
-        r={r}
+        rate={rate}
         />
     ))
 }
 
-function Geometry({r, position, geometry, materials}) {
+function Geometry({rate, position, geometry, materials, SoundEffects}) {
     const meshRef = useRef()
-    const [visible, setVisible] = useState(true)
+    const [visible, setVisible] = useState(false)
 
     const startingMaterial = getRandomMaterial()
 
@@ -61,6 +95,8 @@ function Geometry({r, position, geometry, materials}) {
 
     function handleClick(e) {
         const mesh = e.object;
+
+        gsap.utils.random(SoundEffects).play()
 
         gsap.to(mesh.rotation, {
             x: `+=${gsap.utils.random(0,2)}`,
@@ -81,10 +117,31 @@ function Geometry({r, position, geometry, materials}) {
         document.body.style.cursor = "default"
     }
 
+    useEffect(() => {
+        let ctx = gsap.context(() => {
+            setVisible(true)
+            gsap.from(meshRef.current.scale, {
+                x:0,
+                y:0,
+                z:0,
+                duration: 1,
+                ease: "elastic.out(1,0.3)",
+                delay: 0.3,
+            })
+        })
+        return () => ctx.revert(); // cleanup to avoid reloading while navigating through pages
+    }, [])
+
     return (
         <group position={position} ref={meshRef}>
-            <Float speed={5 * r} rotationIntensity={6 * r} floatIntensity={5 * r}>
-                <mesh geometry={geometry} onClick={handleClick} onPointerOver={handlePointerOver} onPointerOut={handlePointerOut} visible={visible} material={startingMaterial} />
+            <Float speed={5 * rate} rotationIntensity={6 * rate} floatIntensity={5 * rate}>
+                <mesh 
+                geometry={geometry} 
+                onClick={handleClick} 
+                onPointerOver={handlePointerOver} 
+                onPointerOut={handlePointerOut} 
+                visible={visible} 
+                material={startingMaterial} />
             </Float>
         </group>
     )
