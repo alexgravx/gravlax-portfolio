@@ -1,6 +1,12 @@
+"use client"
+
 import Link from "next/link";
-import React from "react"
+import React, { useEffect, useRef } from "react"
 import { MdArrowOutward } from "react-icons/md";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+gsap.registerPlugin(ScrollTrigger)
 
 type ProjectType = {
     title: string;
@@ -17,13 +23,44 @@ type ContentListProps = {
 
 const ContentIndex = ({ items, contentType, fallbackItemImage, viewMoreText = "Read More"}:ContentListProps) => {
 
-const urlPrefix = "/project"
+    const urlPrefix = "/project";
+
+    const component = useRef(null)
+    const itemsRef = useRef<Array<HTMLLIElement | null>>([]);
+
+    useEffect(() => {
+        let ctx = gsap.context(() => {
+            itemsRef.current.forEach((item) => {
+               gsap.fromTo(item,
+                {opacity:0, y:20},
+                {
+                    opacity:1, 
+                    y:0, 
+                    duration:1.3, 
+                    ease: "power2.inOut", 
+                    scrollTrigger: {
+                        trigger: item,
+                        start: "top bottom-=100px",
+                        end: "bottom center",
+                        toggleActions: "play none none none none"
+                    }
+                }
+               )
+            })
+            return () => ctx.revert()
+        }, component)
+    }, [])
 
     return (
         <div>
-            <ul className="grid border-b border-b-slate-100">
+            <ul className="grid border-b border-b-slate-100"
+            ref={component}>
                 {items.map((item, index) => (
-                <li key={index} className="list-item opacity-0f">
+                <li 
+                key={index}
+                ref={(el) => {itemsRef.current[index] = el}}
+                className="list-item opacity-0f"
+                >
                     <Link 
                     href={urlPrefix + "/" + index}
                     className="flex flex-col justify-between border-t border-t-slate-100 py-10 text-slate-200 md:flex-row"

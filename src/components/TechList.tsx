@@ -85,7 +85,6 @@ export default function TechList() {
                 </div>
             ))}
         </section>
-        <div className="h-[500vh]"></div>
         </>
 
     );

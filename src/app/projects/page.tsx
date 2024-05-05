@@ -9,6 +9,15 @@ const Main = () => {
 
   const items = [
     {title: "Mastering JS Animations", body: "This is the body", tags: ["JS", "Animations"]},
+    {title: "Mastering JS Animations", body: "This is the body", tags: ["JS", "Animations"]},
+    {title: "Mastering JS Animations", body: "This is the body", tags: ["JS", "Animations"]},
+    {title: "Mastering JS Animations", body: "This is the body", tags: ["JS", "Animations"]},
+    {title: "Mastering JS Animations", body: "This is the body", tags: ["JS", "Animations"]},
+    {title: "Mastering JS Animations", body: "This is the body", tags: ["JS", "Animations"]},
+    {title: "Mastering JS Animations", body: "This is the body", tags: ["JS", "Animations"]},
+    {title: "Mastering JS Animations", body: "This is the body", tags: ["JS", "Animations"]},
+    {title: "Mastering JS Animations", body: "This is the body", tags: ["JS", "Animations"]},
+    {title: "Mastering JS Animations", body: "This is the body", tags: ["JS", "Animations"]},
   ]
 
   return (
