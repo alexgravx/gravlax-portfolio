@@ -1,6 +1,7 @@
 import Bounded from "@/components/Bounded"
 import Button from "@/components/Button";
 import Heading from "@/components/Heading";
+import Image from "next/image";
 
 const PrimaryText = "Test"
 const bio = "Ceci est une biographie de ma personne. I am curious, hard-working, and particularly motivated by the subjects " 
@@ -19,7 +20,13 @@ const Biography = () => {
         <div className="prose prose-xl prose-slate prose-invert col-start-1">
           {bio}
         </div>
-        <Button linkField="/about" label="test" />
+        <Button linkField="/" label="Résumé" />
+        <Image 
+        src="/profile.jpg" 
+        alt="profile image" 
+        className="row-start-1 max-w-sm md:col-start-2 md:row-end-3 rounded-xl" 
+        width="260" 
+        height="260"/>
       </div>
     </Bounded>
   );
