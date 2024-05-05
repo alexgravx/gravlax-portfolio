@@ -59,7 +59,7 @@ const ContentIndex = ({ items, contentType, fallbackItemImage, viewMoreText = "R
                 <li 
                 key={index}
                 ref={(el) => {itemsRef.current[index] = el}}
-                className="list-item opacity-0f"
+                className="list-item opacity-0"
                 >
                     <Link 
                     href={urlPrefix + "/" + index}
