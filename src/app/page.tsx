@@ -7,7 +7,6 @@ export default function Main() {
   return (
     <div>
       <Home />
-      <TechList />
     </div>
   );
 }

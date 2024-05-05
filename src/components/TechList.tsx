@@ -4,6 +4,8 @@ import React, { useEffect, useRef } from "react"
 import { MdCircle } from "react-icons/md"
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import Heading from "./Heading";
+import Bounded from "./Bounded";
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -60,9 +62,11 @@ export default function TechList() {
     return (
         <>
         <section className="overflow-hidden" ref={component}>
-            <h1 className="px-4 py-10 md:px-6 md:py-14 lg:py-16">
-            Mes Compétences
-            </h1>
+            <Bounded as="div">
+                <Heading size="xl" className="mb-8" as="h2">
+                    Mes compétences
+                </Heading>
+            </Bounded>
             {items.map(({tech_name, tech_color}, index) => (
                 <div key={index} className="tech-row mb-8 flex items-center justify-center gap-4 text-slate-700" aria-label={tech_name}>
                     {Array.from({length: 15}, (_, index) => (
