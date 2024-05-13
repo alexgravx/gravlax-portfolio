@@ -4,12 +4,8 @@ import Button from "@/components/Button";
 import Heading from "@/components/Heading";
 
 const PrimaryText = "About Me"
-const bio = "Ceci est une biographie de ma personne. I am curious, hard-working, and particularly motivated by the subjects " 
-+ "I am passionate about: computer science, chemistry, physics. My skills of analysis and synthesis allow me to lead projects with efficiency. "
-+ "My thoroughness and my ability to listen to advice are part of my strengths."
-+ "In addition to my engineering studies, I am a member of several associations that allow me to develop my technical, artistic and soft skills."
 
-const Biography = () => {
+const Biography = ({bio}:{bio:string}) => {
 
   return (
     <>

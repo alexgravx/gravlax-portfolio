@@ -16,6 +16,8 @@ export default function TechList() {
         tech_name: string;
       }
 
+    const heading_text = "My skills"
+
     const items:techitem[] = [
         {tech_name:"Frontend", tech_color: "#ed8c36"},
         {tech_name:"Backend", tech_color: "#fefce4"},
@@ -64,7 +66,7 @@ export default function TechList() {
         <section className="overflow-hidden" ref={component}>
             <Bounded as="div">
                 <Heading size="xl" className="mb-8" as="h2">
-                    Mes compétences
+                    {heading_text}
                 </Heading>
             </Bounded>
             {items.map(({tech_name, tech_color}, index) => (
