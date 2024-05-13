@@ -23,7 +23,7 @@ type ContentListProps = {
 
 const ContentIndex = ({ items, contentType, fallbackItemImage, viewMoreText = "Read More"}:ContentListProps) => {
 
-    const urlPrefix = "/project";
+    const urlPrefix = "/projects";
 
     const component = useRef(null)
     const itemsRef = useRef<Array<HTMLLIElement | null>>([]);
