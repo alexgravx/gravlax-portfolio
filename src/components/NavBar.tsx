@@ -9,8 +9,8 @@ import { usePathname } from "next/navigation";
 
 const settings = [
     {link: "/about", label:"About"},
-    {link: "/experience", label:"Experience"},
     {link: "/projects", label:"Projects"},
+    {link: "/contact", label:"Contact"},
 ]
 
 const button_data = {path: "/", label: "Contact"}
@@ -85,13 +85,13 @@ export default function NavBar() {
               )}
             </React.Fragment>
           ))}
-          <li>
+          {/* <li>
             <Button
               linkField={button_data.path}
               label={button_data.label}
               className="ml-3"
             />
-          </li>
+          </li> */}
         </div>
         <DesktopMenu pathname={pathname} />
       </ul>
@@ -147,13 +147,13 @@ function DesktopMenu({pathname} : {pathname: string}) {
           )}
         </React.Fragment>
       ))}
-      <li>
+      {/* <li>
         <Button
           linkField={button_data.path}
           label={button_data.label}
           className="ml-3"
         />
-      </li>
+      </li> */}
     </div>
   );
 }
