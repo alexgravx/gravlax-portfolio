@@ -28,11 +28,11 @@ export default function Home() {
           opacity: 1, 
           rotate: 0, 
           ease: "expo.out",
-          duration: 0.5,
-          delay: 0.5,
+          duration: 0.3,
+          delay: 0.3,
           transformOrigin: "top left",
           stagger: {
-            each: 0.1,
+            each: 0.04,
             from: "random"
           }
         });
