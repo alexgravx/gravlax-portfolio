@@ -10,12 +10,12 @@ const Main = () => {
   + " In addition to my engineering studies, I am a member of several associations that allow me to develop my technical, artistic and soft skills."
 
   const education = [
-    {title: "Collège Stanislas Paris", time_period: "2013-2022", institution: "Scientific bachelor degree", description: "I followed an intensive two-year preparation in Mathematics, Physics, Engineering, Computer Science & Chemistry for the highly selective French School of Engineering (2020-2022)"},
     {title: "CentraleSupélec", time_period: "2022-2026", institution: "Master Engineering degree", description: "Coursework:"
     +"Computer Science: Web Data Intelligence, Information Systems, Algorithms, Networks and Security;"
     +"Corporate: Corporate finance, Business management, Law (contracts and intellectual property), Economy & Industrial Engineering;"
     +"Physics: Fluid mechanics, Study of materials, Satellite imagery analysis with radiometry and polarimetry;"
     +"Mathematics: Integration, Probability, Partial Differential Equations;"},
+    {title: "Collège Stanislas Paris", time_period: "2013-2022", institution: "Scientific bachelor degree", description: "I followed an intensive two-year preparation in Mathematics, Physics, Engineering, Computer Science & Chemistry for the highly selective French School of Engineering (2020-2022)"},
   ] 
 
   const experiences = [

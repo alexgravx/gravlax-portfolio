@@ -4,7 +4,7 @@ import Link from "next/link";
 import Bounded from "@/components/Bounded";
 import { FaGithub, FaTwitter, FaLinkedin } from "react-icons/fa6";
 
-const settings = {name: "Alexandre Gravereaux", github_link: "", twitter_link:"", linkedin_link:""}
+const settings = {name: "Alexandre Gravereaux", github_link: "https://github.com/alexgravx", twitter_link:"https://twitter.com/alex_gravx", linkedin_link:"https://www.linkedin.com/in/alexandre-gravereaux-9b822521b/"}
 
 export default async function Footer() {
 

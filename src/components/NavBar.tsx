@@ -10,7 +10,7 @@ import { usePathname } from "next/navigation";
 const settings = [
     {link: "/about", label:"About"},
     {link: "/projects", label:"Projects"},
-    {link: "/contact", label:"Contact"},
+    {link: "https://www.linkedin.com/in/alexandre-gravereaux-9b822521b/", label:"Contact"},
 ]
 
 const button_data = {path: "/", label: "Contact"}

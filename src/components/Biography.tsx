@@ -2,7 +2,8 @@ import Avatar from "@/components/Avatar";
 import Bounded from "@/components/Bounded"
 import Button from "@/components/Button";
 import Heading from "@/components/Heading";
-
+import Link from "next/link";
+  
 const PrimaryText = "About Me"
 
 const Biography = ({bio}:{bio:string}) => {
@@ -17,7 +18,7 @@ const Biography = ({bio}:{bio:string}) => {
         <div className="prose prose-xl prose-slate prose-invert col-start-1">
           {bio}
         </div>
-        <Button linkField="/" label="Résumé" />
+        <Button linkField="/CV_AlexandreGravereaux.pdf" label="Resume" />
         <Avatar 
         image_link="/profile.jpg" 
         alt="image profile"
