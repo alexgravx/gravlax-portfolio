@@ -3,6 +3,8 @@ import { notFound } from "next/navigation"
 import TextBlock from "@/components/TextBlock"
 import Bounded from "@/components/Bounded"
 import Heading from "@/components/Heading"
+import { items_list } from "../page"
+import ImageBlock from "@/components/ImageBlock"
 
 type Params = { uid: string }
 
@@ -13,30 +15,29 @@ function formatDate(date: string) {
     if (date) {
 
         const dateOptions: Intl.DateTimeFormatOptions = {
-            weekday: "long",
             year: "numeric",
             month: "long",
-            day: "numeric"
         };
 
         return new Intl.DateTimeFormat("en-US", dateOptions).format(new Date(date))
     }
 }
 
-
 export default function Page({ params } : { params: Params }) {
     return (
     <Bounded as="article">
         <div className="rounded-2xl border-2 border-slate-800 bg-slate-900 px-4 py-10 md-px:8 md:py-2O"  >
-            <Heading as="h1">Titre N° {params.uid}</Heading>
+            <Heading as="h1">{items_list[parseInt(params.uid)].title}</Heading>
             <div className="flex gap-4 text-yellow-400 text-xl font-bold">
-                {["Tag1","Tag2"].map((tag, index) => (
+                {items_list[parseInt(params.uid)].tags.map((tag, index) => (
                     <span key={index}>{tag}</span>
                 ))}
             </div>
-            <p className="mt-8 border-b border-slate-600 text-xl font-medium text-slate-300">{formatDate('01/01/2020')}</p>
+            <p className="mt-8 border-b border-slate-600 text-xl font-medium text-slate-300">{formatDate(items_list[parseInt(params.uid)].date)}</p>
             <div className="prose prose-lg prose-invert mt-12 w-full max-w-none md:mt-20">
-            <TextBlock text={testtext} />
+                {items_list[parseInt(params.uid)].image != "" &&
+                <ImageBlock image_link={items_list[parseInt(params.uid)].image} />}
+                <TextBlock text={items_list[parseInt(params.uid)].body} />
             </div>
         </div> 
     </Bounded>
