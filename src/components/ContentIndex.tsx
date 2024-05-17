@@ -67,7 +67,7 @@ const ContentIndex = ({ items, contentType, fallbackItemImage, viewMoreText = "R
                     aria-label={item.title}>
                         <div className="flex flex-col">
                             <span className="text-3xl font-bold">{item.title}</span>
-                            <div className="flex gap-3 text-yellow-400 text-lg font-bold">
+                            <div className="flex gap-3 text-blue-400 text-lg font-bold">
                                 {item.tags.map((tag, index) => (
                                     <span key={index}>{tag}</span>
                                 ))}

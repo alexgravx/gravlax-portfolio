@@ -28,7 +28,7 @@ export default function Page({ params } : { params: Params }) {
     <Bounded as="article">
         <div className="rounded-2xl border-2 border-slate-800 bg-slate-900 px-4 py-10 md-px:8 md:py-2O"  >
             <Heading as="h1">{items_list[parseInt(params.uid)].title}</Heading>
-            <div className="flex gap-4 text-yellow-400 text-xl font-bold">
+            <div className="flex gap-4 text-blue-400 text-xl font-bold">
                 {items_list[parseInt(params.uid)].tags.map((tag, index) => (
                     <span key={index}>{tag}</span>
                 ))}
