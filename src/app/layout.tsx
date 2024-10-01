@@ -22,7 +22,6 @@ export default function RootLayout({
   return (
     <html lang="en" className="bg-slate-900 text-slate-100 cursor-none">
       <body className={clsx(urbanist.className, "relative min-h-screen")}>
-        <CustomCursor />
         <Header />
         {children}
         <Footer />
