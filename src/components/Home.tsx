@@ -70,7 +70,7 @@ export default function Home() {
         <div ref={component} className="grid min-h-[70vh] grid-cols-1 md:grid-cols-2 items-center">
           <Shapes />
           <div className="col-start-1 md:row-start-1">
-            <h1 className="mb-8 text-[clamp(3rem,9vmin,16rem)] font-extrabold leading-none tracking-tighter" aria-label={firstName + " " + lastName}>
+            <h1 className="mb-8 text-[clamp(3rem,11vmin,16rem)] font-extrabold leading-none tracking-tighter" aria-label={firstName + " " + lastName}>
               <span className="block text-slate-300">{renderLetters(firstName, "first")}</span>
               <span className="-mt-[.2em] block text-slate-300">{renderLetters(lastName, "last")}</span>
             </h1>
