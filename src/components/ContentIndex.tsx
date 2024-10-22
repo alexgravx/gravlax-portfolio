@@ -1,8 +1,9 @@
 "use client"
 
 import Link from "next/link";
+import clsx from "clsx";
 import React, { useEffect, useRef } from "react"
-import { MdArrowOutward } from "react-icons/md";
+import { FaGithub } from "react-icons/fa";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
@@ -10,6 +11,7 @@ gsap.registerPlugin(ScrollTrigger)
 
 type ProjectType = {
     title: string;
+    link: string;
     body: string;
     tags: string[];
 }
@@ -21,7 +23,7 @@ type ContentListProps = {
     viewMoreText?: string;
 }
 
-const ContentIndex = ({ items, contentType, fallbackItemImage, viewMoreText = "Read More"}:ContentListProps) => {
+const ContentIndex = ({ items, contentType, fallbackItemImage, viewMoreText = "Link"}:ContentListProps) => {
 
     const urlPrefix = "/projects";
 
@@ -62,8 +64,8 @@ const ContentIndex = ({ items, contentType, fallbackItemImage, viewMoreText = "R
                 className="list-item opacity-0"
                 >
                     <Link 
-                    href={urlPrefix + "/" + index}
-                    className="flex flex-col justify-between border-t border-t-slate-100 py-10 text-slate-200 md:flex-row"
+                    href={item.link}
+                    className={clsx("flex flex-col justify-between border-t border-t-slate-100 py-10 text-slate-200 md:flex-row", (item.link == "private") ? 'pointer-events-none' : '')}
                     aria-label={item.title}>
                         <div className="flex flex-col">
                             <span className="text-3xl font-bold">{item.title}</span>
@@ -74,7 +76,7 @@ const ContentIndex = ({ items, contentType, fallbackItemImage, viewMoreText = "R
                             </div>
                         </div>
                         <span className="ml-auto flex items-center gap-2 text-xl font-medium md:ml-0">
-                            {viewMoreText} <MdArrowOutward />
+                            {(item.link == "private") ? 'Private' : viewMoreText} {(item.link == "private") ? <></> : <FaGithub />}
                         </span>
                     </Link>
                 </li>
