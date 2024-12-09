@@ -2,10 +2,37 @@ import clsx from "clsx";
 import React from "react";
 import Link from "next/link";
 import Bounded from "@/components/Bounded";
-import { FaGithub, FaTwitter, FaLinkedin } from "react-icons/fa6";
+import { FaGithub, FaInbox, FaLinkedin } from "react-icons/fa6";
 
-const settings = {name: "Alexandre Gravereaux", github_link: "https://github.com/alexgravx", twitter_link:"https://twitter.com/alex_gravx", linkedin_link:"https://www.linkedin.com/in/alexandre-gravereaux-9b822521b/"}
+const settings = {name: "Alexandre Gravereaux", github_link: "https://github.com/alexgravx", mail_link:"mailto:alexandre.gravereaux@student-cs.fr", linkedin_link:"https://www.linkedin.com/in/alexandre-gravereaux-9b822521b/"}
 
+export function ContactLinks() {
+  return (
+    <div className="socials inline-flex justify-center sm:justify-end">
+      <Link
+        href={settings.github_link}
+        className="p-2 text-2xl text-slate-300 transition-all duration-150 hover:scale-125 hover:text-blue-400"
+        aria-label={settings.name + " on GitHub"}
+      >
+        <FaGithub />
+      </Link>
+      <Link
+        href={settings.mail_link}
+        className="p-2 text-2xl text-slate-300 transition-all duration-150 hover:scale-125 hover:text-blue-400"
+        aria-label={settings.name + " on Mail"}
+      >
+        <FaInbox />
+      </Link>
+      <Link
+        href={settings.linkedin_link}
+        className="p-2 text-2xl text-slate-300 transition-all duration-150 hover:scale-125 hover:text-blue-400"
+        aria-label={settings.name + " on LinkedIn"}
+      >
+        <FaLinkedin />
+      </Link>
+    </div>
+  )
+}
 export default async function Footer() {
 
   return (
@@ -28,29 +55,7 @@ export default async function Footer() {
             © {new Date().getFullYear()} {settings.name}
           </p>
         </div>
-        <div className="socials inline-flex justify-center sm:justify-end">
-            <Link
-              href={settings.github_link}
-              className="p-2 text-2xl text-slate-300 transition-all duration-150 hover:scale-125 hover:text-blue-400"
-              aria-label={settings.name + " on GitHub"}
-            >
-              <FaGithub />
-            </Link>
-            <Link
-              href={settings.twitter_link}
-              className="p-2 text-2xl text-slate-300 transition-all duration-150 hover:scale-125 hover:text-blue-400"
-              aria-label={settings.name + " on Twitter"}
-            >
-              <FaTwitter />
-            </Link>
-            <Link
-              href={settings.linkedin_link}
-              className="p-2 text-2xl text-slate-300 transition-all duration-150 hover:scale-125 hover:text-blue-400"
-              aria-label={settings.name + " on LinkedIn"}
-            >
-              <FaLinkedin />
-            </Link>
-        </div>
+        <ContactLinks />
       </div>
     </Bounded>
   );

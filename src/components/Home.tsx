@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import { gsap, random } from "gsap";
 import Shapes from "@/components/Shapes"
 import Bounded from "@/components/Bounded";
+import { ContactLinks } from "@/components/Footer"
 
 export default function Home() {
 
@@ -74,7 +75,8 @@ export default function Home() {
               <span className="block text-slate-300">{renderLetters(firstName, "first")}</span>
               <span className="-mt-[.2em] block text-slate-300">{renderLetters(lastName, "last")}</span>
             </h1>
-            <span className="job-title block bg-gradient-to-tr from-green-500 via-blue-400 to-green-300 bg-clip-text text-2xl font-bold uppercase tracking[.2em] text-transparent opacity-0 md:text-4xl">{title}</span>
+            <span className="mb-8 job-title block bg-gradient-to-tr from-green-500 via-blue-400 to-green-300 bg-clip-text text-2xl font-bold uppercase tracking[.2em] text-transparent opacity-0 md:text-4xl">{title}</span>
+            <ContactLinks />
           </div>
         </div>
       </Bounded>
