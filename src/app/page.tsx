@@ -5,6 +5,7 @@ import TechList from "@/components/TechList";
 import Bounded from "@/components/Bounded";
 import ContentIndex from "@/components/ContentIndex";
 import Heading from "@/components/Heading";
+import Button from "@/components/Button";
 import {bio, education, experiences, items} from "./data"
 
 export default function Main() {
@@ -17,6 +18,22 @@ export default function Main() {
       <Home />
       <Biography bio={bio}/>
       <TechList />
+
+      <Bounded className="lg:py-0 lg:pt-10">
+      <Heading as="h2" size="lg">
+        {"My last project:"}
+      </Heading>
+      <div className="flex items-center">
+      <Heading as="h3" size="sm" className="m-10">
+        {"Prisoner's dilemma"}
+      </Heading>
+      <Button linkField="https://www.prisoner.alexandregravereaux.xyz" label="Try it now!" />
+      </div>
+
+
+      </Bounded>
+
+
       <Experience heading="Education" experiences={education}/>
       <Experience heading="Experience" experiences={experiences}/>
 
