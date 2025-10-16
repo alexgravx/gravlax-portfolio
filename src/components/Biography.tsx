@@ -18,7 +18,7 @@ const Biography = ({bio}:{bio:string}) => {
         <div className="prose prose-xl prose-slate prose-invert col-start-1">
           {bio}
         </div>
-        <Button linkField="/CV_AlexandreGravereaux.pdf" label="Resume" />
+        <Button linkField="/Alexandre_Gravereaux_resume.pdf" label="Resume" />
         <Avatar 
         image_link="/profile.jpg" 
         alt="image profile"

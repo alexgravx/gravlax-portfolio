@@ -27,7 +27,7 @@ export default function Main() {
       <Heading as="h3" size="sm" className="m-10">
         {"Prisoner's dilemma"}
       </Heading>
-      <Button linkField="https://www.prisoner.alexandregravereaux.xyz" label="Try it now!" />
+      <Button linkField="https://prisoner.alexandregravereaux.xyz/" label="Try it now!" />
       </div>
 
 
