@@ -4,7 +4,7 @@ import Link from "next/link";
 import Bounded from "@/components/Bounded";
 import { FaGithub, FaInbox, FaLinkedin } from "react-icons/fa6";
 
-const settings = {name: "Alexandre Gravereaux", github_link: "https://github.com/alexgravx", mail_link:"mailto:alexandre.gravereaux@student-cs.fr", linkedin_link:"https://www.linkedin.com/in/alexandre-gravereaux-9b822521b/"}
+const settings = { name: "Alexandre Gravereaux", github_link: "https://github.com/alexgravx", mail_link: "mailto:ag2733@cornell.edu", linkedin_link: "https://www.linkedin.com/in/alexandre-gravereaux/" }
 
 export function ContactLinks() {
   return (
