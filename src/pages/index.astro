@@ -1,14 +1,160 @@
 ---
-// Placeholder. Replaced by the real homepage once a nav model + palette is chosen
-// from /mock. See the plan: Phase 0 decides, Phases 1–4 build.
-import Mock from '../layouts/Mock.astro';
+import Base from '../layouts/Base.astro';
+import Banner from '../components/Banner.astro';
+import Terminal from '../components/Terminal.astro';
+import Projects from '../components/Projects.astro';
+import SectionHead from '../components/SectionHead.astro';
+import { profile, education, skills, experience, resumePdf } from '../content/resume';
 ---
 
-<Mock title="gravlax" variant="a">
+<Base>
   <main class="wrap">
-    <h1>gravlax-portfolio</h1>
-    <p class="comment">
-      # Work in progress. Head to <a href="/mock">/mock</a> to pick a direction.
-    </p>
+    <section class="hero">
+      <Banner />
+      <p class="lede">{profile.title} · {profile.location}</p>
+      <p class="bio">{profile.bio}</p>
+    </section>
+
+    <Terminal />
+
+    <hr class="rule" />
+
+    <section id="projects" class="bleed">
+      <SectionHead cmd="ls -l projects/" label="projects" />
+      <Projects />
+    </section>
+
+    <hr class="rule" />
+
+    <section id="experience">
+      <SectionHead cmd="cat experience.md" label="experience" />
+      {
+        experience.map((r) => (
+          <div class="entry">
+            <div class="entry-head">
+              <strong>
+                {r.href ? (
+                  <a href={r.href} target="_blank" rel="noopener noreferrer">
+                    {r.org}
+                  </a>
+                ) : (
+                  r.org
+                )}
+                <span class="comment"> · {r.title}</span>
+              </strong>
+              <span class="comment">
+                {r.start} — {r.end}
+              </span>
+            </div>
+            <p>{r.summary}</p>
+            <ul class="tags">
+              {r.stack.map((t) => (
+                <li>{t}</li>
+              ))}
+            </ul>
+          </div>
+        ))
+      }
+    </section>
+
+    <hr class="rule" />
+
+    <section id="skills">
+      <SectionHead cmd="cat skills.txt" label="skills" />
+      {
+        Object.entries(skills).map(([group, items]) => (
+          <div class="skill-row">
+            <strong class="skill-group">{group}</strong>
+            <ul class="tags">
+              {items.map((t) => (
+                <li>{t}</li>
+              ))}
+            </ul>
+          </div>
+        ))
+      }
+    </section>
+
+    <hr class="rule" />
+
+    <section id="education">
+      <SectionHead cmd="cat education.md" label="education" />
+      {
+        education.map((e) => (
+          <div class="entry">
+            <div class="entry-head">
+              <strong>{e.school}</strong>
+              <span class="comment">{e.date}</span>
+            </div>
+            <div>
+              {e.degree}
+              {e.note && <span class="comment"> ({e.note})</span>}
+            </div>
+            <p class="comment">{e.summary}</p>
+          </div>
+        ))
+      }
+    </section>
+
+    <hr class="rule" />
+
+    <section id="contact">
+      <SectionHead cmd="contact" label="contact" />
+      <div class="entry">
+        {
+          profile.links.map((l) => (
+            <div>
+              <span class="comment">{l.label.padEnd(9)}</span>
+              <a href={l.href} target="_blank" rel="noopener noreferrer">
+                {l.href.replace(/^https?:\/\//, '')}
+              </a>
+            </div>
+          ))
+        }
+        <div>
+          <span class="comment">{'resume'.padEnd(9)}</span>
+          <a href="/resume">/resume</a> · <a href={resumePdf}>download .pdf</a>
+        </div>
+      </div>
+    </section>
   </main>
-</Mock>
+</Base>
+
+<style>
+  .hero {
+    margin-bottom: var(--sp-6);
+  }
+
+  .lede {
+    color: var(--dim);
+    margin-bottom: var(--sp-4);
+  }
+
+  .bio {
+    margin-bottom: 0;
+  }
+
+  section[id] {
+    scroll-margin-top: 72px;
+  }
+
+  .skill-row {
+    display: flex;
+    gap: var(--sp-3);
+    align-items: baseline;
+    flex-wrap: wrap;
+    margin-bottom: var(--sp-3);
+  }
+
+  .skill-group {
+    min-width: 11ch;
+  }
+
+  .skill-row .tags {
+    margin-top: 0;
+  }
+
+  .entry p {
+    margin: var(--sp-2) 0 0;
+  }
+</style>

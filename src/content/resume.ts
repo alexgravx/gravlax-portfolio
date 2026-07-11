@@ -1,6 +1,11 @@
 /**
- * Single source of truth for every piece of content on the site.
- * Transcribed from public/resume_updated.pdf — keep the two in sync.
+ * Single source of truth for the site.
+ *
+ * Two levels of detail, on purpose:
+ *   - `summary`  — short. Used by the portfolio, which should NOT re-read as a resume.
+ *   - `bullets`  — long.  Used only by /resume, which is the resume.
+ *
+ * Transcribed from public/resume_updated.pdf, plus older projects worth showing.
  */
 
 export interface Link {
@@ -10,12 +15,19 @@ export interface Link {
 
 export interface Education {
   school: string;
-  detail: string;
   degree: string;
   note?: string;
   location: string;
   date: string;
+  /** Portfolio-level: one line. */
+  summary: string;
+  /** Resume-level. */
   coursework?: string[];
+}
+
+export interface Bullet {
+  text: string;
+  children?: string[];
 }
 
 export interface Role {
@@ -25,27 +37,33 @@ export interface Role {
   start: string;
   end: string;
   href?: string;
-  /** Top-level bullets; each may carry nested sub-bullets. */
+  /** Portfolio-level: one or two lines. */
+  summary: string;
+  /** Resume-level. */
   bullets: Bullet[];
   stack: string[];
 }
 
-export interface Bullet {
-  text: string;
-  children?: string[];
-}
-
 export interface Project {
+  id: string;
   name: string;
-  blurb: string;
-  href?: string;
-  hrefLabel?: string;
+  year: string;
+  /** One line, shown on the overview card. */
+  summary: string;
+  /** A short paragraph, shown in the "about" card once selected. */
+  about: string;
+  repo?: string;
+  links?: Link[];
+  /** Private client work with nothing public to link to. */
+  private?: boolean;
   stack: string[];
+  /** Surfaced on /resume (the two the resume actually lists). */
+  onResume?: boolean;
 }
 
 export const profile = {
   name: 'Alexandre Gravereaux',
-  handle: 'alexgravx',
+  handle: 'gravlax',
   title: 'Software Engineer',
   location: 'New York, NY',
   // The updated resume deliberately omits an email address.
@@ -55,21 +73,23 @@ export const profile = {
     { label: 'website', href: 'https://alexgravx.com' },
   ] satisfies Link[],
   bio:
-    "MEng Computer Science student at Cornell Tech with an engineering background from " +
-    "CentraleSupélec. I like optimizing processes and building software that removes drudgery — " +
-    "DevOps, full-stack, and applied ML. Previously kept 2000+ students online as a sysadmin, " +
-    "shipped MVPs through the Paris Digital Lab incubator, and built a SAS-to-Python transpiler " +
-    "at Forvis Mazars.",
+    "I'm a Computer Science master's student at Cornell Tech, with an engineering background from " +
+    'CentraleSupélec. I like optimizing processes and building powerful software tools — DevOps, ' +
+    'full-stack and ML. I helped run the network infrastructure for my school’s student residences, ' +
+    'built MVPs through the Paris Digital Lab incubator, and interned as a Software Engineer at ' +
+    'Forvis Mazars.',
 };
 
 export const education: Education[] = [
   {
     school: 'Cornell Tech, Cornell University',
-    detail: 'Cornell Tech',
-    degree: 'Master of Engineering in Computer Science',
+    degree: 'MEng in Computer Science',
     note: 'merit scholarship recipient',
     location: 'New York, NY',
-    date: 'May 2026',
+    date: '2025 — 2026',
+    summary:
+      'Applied ML, ML engineering, trustworthy AI and algorithms. Working on content moderation: ' +
+      'protecting minors online while keeping teens fairly heard.',
     coursework: [
       'Applied Machine Learning',
       'Machine Learning Engineering',
@@ -79,11 +99,13 @@ export const education: Education[] = [
   },
   {
     school: 'CentraleSupélec, Paris-Saclay University',
-    detail: 'CentraleSupélec',
-    degree: 'Master of Science in Engineering and Applied Mathematics',
+    degree: 'MSc in Engineering and Applied Mathematics',
     note: 'GPA 3.86/4',
     location: 'Paris, France',
-    date: 'May 2025',
+    date: '2022 — 2025',
+    summary:
+      'Computer science (networks, security, distributed & cloud computing, databases) and applied ' +
+      'mathematics (statistics, optimization, probability).',
     coursework: [
       'Statistics and Learning',
       'Optimization',
@@ -96,10 +118,11 @@ export const education: Education[] = [
   },
   {
     school: 'Collège Stanislas',
-    detail: 'Collège Stanislas',
-    degree: 'Classes préparatoires — Math, Computer Science, Physics',
+    degree: 'Classes préparatoires — Math, CS, Physics',
     location: 'Paris, France',
-    date: 'May 2022',
+    date: '2020 — 2022',
+    summary:
+      'Two years of intensive preparation for the entrance exams to the French Grandes Écoles.',
     coursework: [
       'Intensive preparation for the highly competitive entrance exams to the French Grandes Écoles',
     ],
@@ -107,13 +130,12 @@ export const education: Education[] = [
 ];
 
 export const skills = {
-  Languages: ['Python', 'JavaScript', 'Java', 'Go', 'Swift'],
+  Languages: ['Python', 'JavaScript', 'TypeScript', 'Java', 'Go', 'Swift'],
   DevOps: [
     'Docker',
     'Kubernetes',
     'Nginx',
     'GitLab CI/CD',
-    'TGI',
     'Terraform',
     'Ansible',
     'IaC',
@@ -125,13 +147,13 @@ export const skills = {
     'scikit-learn',
     'PyTorch',
     'LangChain',
+    'TGI',
     'Celery',
-    'MySQL',
     'PostgreSQL',
     'MongoDB',
     'Spark',
   ],
-  Fullstack: ['Node.js', 'Express', 'React', 'Vue', 'Next.js', 'Vercel'],
+  Fullstack: ['Node.js', 'Express', 'React', 'Vue', 'Next.js', 'FastAPI'],
 } satisfies Record<string, string[]>;
 
 export const experience: Role[] = [
@@ -141,6 +163,9 @@ export const experience: Role[] = [
     location: 'Paris, France',
     start: 'Sept 2024',
     end: 'Feb 2025',
+    summary:
+      'Software and data engineering on financial apps. Built a SAS-to-Python transpiler on top of ' +
+      'ANTLR that translates 3× faster than an LLM, and with precision an LLM cannot reach.',
     bullets: [
       {
         text:
@@ -172,11 +197,14 @@ export const experience: Role[] = [
   },
   {
     org: 'Paris Digital Lab',
-    title: 'Software Engineer Student',
+    title: 'Software Engineer',
     location: 'Paris, France',
     start: 'Feb 2024',
     end: 'Jul 2024',
     href: 'https://paris-digital-lab.com/',
+    summary:
+      'Prototyped tech for major corporations and start-ups: three MVPs in three 7-week cycles — ' +
+      'Sencial, ElicCIR and Wiloki (see projects).',
     bullets: [
       {
         text:
@@ -204,37 +232,16 @@ export const experience: Role[] = [
     ],
     stack: ['Swift', 'Python', 'Go', 'Kubernetes', 'RabbitMQ', 'LLMs'],
   },
-];
-
-export const projects: Project[] = [
-  {
-    name: 'B2B storage space rental marketplace',
-    blurb:
-      'A storage-space rental platform for professionals — an Airbnb for warehouses — with ' +
-      'reservation, calendar and billing.',
-    href: 'https://yzilog.com/',
-    hrefLabel: 'yzilog.com',
-    stack: ['TypeScript', 'Express', 'Mantine', 'AWS', 'JWT'],
-  },
-  {
-    name: 'Simulation trading platform',
-    blurb:
-      'A professional-style simulated trading platform with order placement, an order book, order ' +
-      'matching and live market data charts.',
-    href: 'https://trading.alexgravx.com/',
-    hrefLabel: 'trading.alexgravx.com',
-    stack: ['Python', 'FastAPI', 'TradingView API', 'AI agents'],
-  },
-];
-
-export const clubs: Role[] = [
   {
     org: 'ViaRézo',
-    title: 'DevOps',
+    title: 'DevOps Engineer',
     location: 'Paris, France',
     start: 'Sept 2022',
     end: 'Jan 2024',
     href: 'https://viarezo.fr/en/',
+    summary:
+      'Internet for 2000+ residents on the Paris-Saclay campus, plus the websites and apps behind ' +
+      'student life — on an OpenStack cluster and a Kubernetes cloud, backed up and monitored.',
     bullets: [
       {
         text:
@@ -254,6 +261,115 @@ export const clubs: Role[] = [
       },
     ],
     stack: ['OpenStack', 'Kubernetes', 'Datadog', 'Nginx', 'Ansible'],
+  },
+];
+
+export const projects: Project[] = [
+  {
+    id: 'yzilog',
+    name: 'B2B storage rental marketplace',
+    year: '2025',
+    summary: 'An Airbnb for warehouses — reservation, calendar and billing.',
+    about:
+      'A storage-space rental platform for professionals, similar to Airbnb, including reservation, ' +
+      'calendar and billing. Deployed on AWS, with JWT authorization.',
+    links: [{ label: 'yzilog.com', href: 'https://yzilog.com/' }],
+    stack: ['TypeScript', 'Express', 'React', 'Mantine', 'AWS'],
+    onResume: true,
+  },
+  {
+    id: 'trading',
+    name: 'Simulation trading platform',
+    year: '2025',
+    summary: 'A professional-style trading simulator with a real matching engine.',
+    about:
+      'A simulated trading platform with order placement, an order book, order matching and live ' +
+      'market data charts. Built with FastAPI and the TradingView API, with AI agents trading against you.',
+    links: [{ label: 'trading.alexgravx.com', href: 'https://trading.alexgravx.com/' }],
+    stack: ['Python', 'FastAPI', 'TradingView API', 'AI agents'],
+    onResume: true,
+  },
+  {
+    id: 'sencial',
+    name: 'Sencial — iOS audio companion',
+    year: '2024',
+    summary: 'Real-time audio modulation through AirPods for the hearing-impaired.',
+    about:
+      'An iOS companion app for hearing-impaired people. It pulls audiograms from Apple Health (or ' +
+      'builds one with an experimental method), then modulates 10+ frequency bands of the surrounding ' +
+      'environment in real time while you listen to music or talk to a colleague. Improved voice ' +
+      'perception for 89% of users. Built at Paris Digital Lab.',
+    repo: 'alexgravx/Swift-audio-utils',
+    stack: ['Swift', 'AVAudioEngine'],
+  },
+  {
+    id: 'eliccir',
+    name: 'ElicCIR — tax credit companion',
+    year: '2024',
+    summary: 'RAG over private infrastructure for Thales. Saved 300k€ and 3000 hours a year.',
+    about:
+      'A tax credit filing tool running on private infrastructure for Thales, using data parsing and ' +
+      'LLMs with RAG. Self-hosted inference with HuggingFace TGI, so no data ever leaves the building. ' +
+      'Built at Paris Digital Lab.',
+    private: true,
+    stack: ['Python', 'LangChain', 'TGI', 'RAG'],
+  },
+  {
+    id: 'wiloki',
+    name: 'Wiloki — A/B testing platform',
+    year: '2024',
+    summary: 'Simulated hundreds of students to pick the best learning algorithm.',
+    about:
+      'An A/B testing platform for an EdTech game-based learning company. It massively simulates ' +
+      'virtual student profiles with randomized knowledge and skill levels, queued through RabbitMQ ' +
+      'inside a Kubernetes cluster, and reports detailed metrics so the best coaching algorithm wins. ' +
+      'Built at Paris Digital Lab.',
+    private: true,
+    stack: ['Go', 'Docker', 'Kubernetes', 'Helm', 'RabbitMQ'],
+  },
+  {
+    id: 'leaderboard',
+    name: 'Drone race leaderboard',
+    year: '2024',
+    summary: 'Live timing and rankings for drone races.',
+    about:
+      'A desktop leaderboard for drone races: add participants, time them with numerical chronometers, ' +
+      'and display a live ranking as the race unfolds.',
+    private: true,
+    stack: ['JavaScript', 'Electron'],
+  },
+  {
+    id: 'soil',
+    name: 'Satellite-based soil analysis',
+    year: '2023',
+    summary: 'Classifying terrain from satellite imagery — city, forest, field, water.',
+    about:
+      'An ML pipeline classifying soils by category (city, forest, field, water, …) from satellite ' +
+      'imagery, comparing SVM, K-Means and deep neural networks.',
+    repo: 'alexgravx/EI-Soil-Classification',
+    stack: ['Python', 'scikit-learn', 'SVM', 'K-Means'],
+  },
+  {
+    id: 'movies',
+    name: 'Movie streaming platform',
+    year: '2023',
+    summary: 'A Netflix-like recommender, built in one week.',
+    about:
+      'A user-friendly streaming interface in the spirit of Netflix, making personalized ' +
+      'recommendations. Built end-to-end in a single week.',
+    repo: 'alexgravx/EI-Web-Design',
+    stack: ['JavaScript', 'React', 'Express'],
+  },
+  {
+    id: 'insults',
+    name: 'Twitter insult detector',
+    year: '2022',
+    summary: 'A dashboard tracking abusive tweets, powered by a random forest.',
+    about:
+      'A dashboard tracking tweets containing insults. Data pipeline over the Twitter API with Pandas, ' +
+      'then classification with a random forest and a keyword list.',
+    repo: 'alexgravx/Coding-Week-2022',
+    stack: ['Python', 'Pandas', 'Plotly', 'Dash'],
   },
 ];
 

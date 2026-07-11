@@ -1,0 +1,349 @@
+---
+import { projects } from '../content/resume';
+
+/**
+ * Windowed card browser, after the "code" tab on simon.lecoq.io:
+ * a sidebar of entries on the left, a grid of typed cards on the right,
+ * an "overview" entry whose cards are the projects themselves, and a
+ * staggered fade-in on every switch.
+ */
+---
+
+<div class="browser" data-projects>
+  <aside class="side">
+    <button type="button" class="side-item" data-select="overview" aria-current="true">
+      overview
+    </button>
+    <span class="side-label">projects</span>
+    {
+      projects.map((p) => (
+        <button type="button" class="side-item" data-select={p.id}>
+          {p.name}
+        </button>
+      ))
+    }
+  </aside>
+
+  <div class="panels">
+    {/* ---------- overview: one card per project ---------- */}
+    <div class="cards" data-panel="overview">
+      {
+        projects.map((p) => (
+          <button type="button" class="card as-link" data-select={p.id}>
+            <span class="card-head">
+              <svg class="i" viewBox="0 0 16 16" aria-hidden="true">
+                <path d="M0 2.75C0 1.784.784 1 1.75 1h12.5c.966 0 1.75.784 1.75 1.75v10.5A1.75 1.75 0 0 1 14.25 15H1.75A1.75 1.75 0 0 1 0 13.25Zm1.75-.25a.25.25 0 0 0-.25.25v10.5c0 .138.112.25.25.25h12.5a.25.25 0 0 0 .25-.25V2.75a.25.25 0 0 0-.25-.25ZM7.25 8a.75.75 0 0 1-.22.53l-2.25 2.25a.75.75 0 0 1-1.06-1.06L5.44 8 3.72 6.28a.75.75 0 1 1 1.06-1.06l2.25 2.25c.141.14.22.331.22.53Zm1.5 1.5a.75.75 0 0 0 0 1.5h3a.75.75 0 0 0 0-1.5Z" />
+              </svg>
+              <span class="card-name">{p.name}</span>
+              <span class="card-year">{p.year}</span>
+            </span>
+            <span class="card-body">{p.summary}</span>
+          </button>
+        ))
+      }
+    </div>
+
+    {/* ---------- one panel per project ---------- */}
+    {
+      projects.map((p) => (
+        <div class="cards" data-panel={p.id} hidden>
+          <article class="card wide">
+            <div class="card-head">
+              <svg class="i" viewBox="0 0 16 16" aria-hidden="true">
+                <path d="M8 1.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm6.5-.25A.75.75 0 0 1 7.25 7h1a.75.75 0 0 1 .75.75v2.75h.25a.75.75 0 0 1 0 1.5h-2a.75.75 0 0 1 0-1.5h.25v-2h-.25a.75.75 0 0 1-.75-.75ZM8 6a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z" />
+              </svg>
+              <span class="card-name">about</span>
+              <span class="card-year">{p.year}</span>
+            </div>
+            <div class="card-body">{p.about}</div>
+          </article>
+
+          {p.repo && (
+            <article class="card">
+              <div class="card-head">
+                <svg class="i" viewBox="0 0 16 16" aria-hidden="true">
+                  <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8Z" />
+                </svg>
+                <span class="card-name">github</span>
+              </div>
+              <div class="card-body">
+                <a href={`https://github.com/${p.repo}`} target="_blank" rel="noopener noreferrer">
+                  {p.repo}
+                </a>
+              </div>
+            </article>
+          )}
+
+          {p.links && (
+            <article class="card">
+              <div class="card-head">
+                <svg class="i" viewBox="0 0 16 16" aria-hidden="true">
+                  <path d="M7.775 3.275a.75.75 0 0 0 1.06 1.06l1.25-1.25a2 2 0 1 1 2.83 2.83l-2.5 2.5a2 2 0 0 1-2.83 0 .75.75 0 0 0-1.06 1.06 3.5 3.5 0 0 0 4.95 0l2.5-2.5a3.5 3.5 0 0 0-4.95-4.95Zm-4.69 9.64a2 2 0 0 1 0-2.83l2.5-2.5a2 2 0 0 1 2.83 0 .75.75 0 0 0 1.06-1.06 3.5 3.5 0 0 0-4.95 0l-2.5 2.5a3.5 3.5 0 0 0 4.95 4.95l1.25-1.25a.75.75 0 0 0-1.06-1.06l-1.25 1.25a2 2 0 0 1-2.83 0Z" />
+                </svg>
+                <span class="card-name">links</span>
+              </div>
+              <div class="card-body">
+                {p.links.map((l) => (
+                  <div>
+                    <a href={l.href} target="_blank" rel="noopener noreferrer">
+                      {l.label}
+                    </a>
+                  </div>
+                ))}
+              </div>
+            </article>
+          )}
+
+          {p.private && (
+            <article class="card">
+              <div class="card-head">
+                <svg class="i" viewBox="0 0 16 16" aria-hidden="true">
+                  <path d="M4 4a4 4 0 0 1 8 0v2h.25c.966 0 1.75.784 1.75 1.75v5.5A1.75 1.75 0 0 1 12.25 15h-8.5A1.75 1.75 0 0 1 2 13.25v-5.5C2 6.784 2.784 6 3.75 6H4Zm6.5 2V4a2.5 2.5 0 1 0-5 0v2Zm-6.75 1.5a.25.25 0 0 0-.25.25v5.5c0 .138.112.25.25.25h8.5a.25.25 0 0 0 .25-.25v-5.5a.25.25 0 0 0-.25-.25Z" />
+                </svg>
+                <span class="card-name">source</span>
+              </div>
+              <div class="card-body comment">Private client work — no public repository.</div>
+            </article>
+          )}
+
+          <article class="card">
+            <div class="card-head">
+              <svg class="i" viewBox="0 0 16 16" aria-hidden="true">
+                <path d="M2 2.75C2 1.784 2.784 1 3.75 1h8.5c.966 0 1.75.784 1.75 1.75v10.5A1.75 1.75 0 0 1 12.25 15h-8.5A1.75 1.75 0 0 1 2 13.25Zm1.75-.25a.25.25 0 0 0-.25.25v10.5c0 .138.112.25.25.25h8.5a.25.25 0 0 0 .25-.25V2.75a.25.25 0 0 0-.25-.25ZM5 4.75A.75.75 0 0 1 5.75 4h4.5a.75.75 0 0 1 0 1.5h-4.5A.75.75 0 0 1 5 4.75Zm0 3A.75.75 0 0 1 5.75 7h4.5a.75.75 0 0 1 0 1.5h-4.5A.75.75 0 0 1 5 7.75Zm0 3a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75Z" />
+              </svg>
+              <span class="card-name">stack</span>
+            </div>
+            <div class="card-body">
+              <ul class="tags">
+                {p.stack.map((t) => (
+                  <li>{t}</li>
+                ))}
+              </ul>
+            </div>
+          </article>
+        </div>
+      ))
+    }
+  </div>
+</div>
+
+<script>
+  const root = document.querySelector<HTMLElement>('[data-projects]');
+
+  if (root) {
+    const panels = root.querySelectorAll<HTMLElement>('[data-panel]');
+    const sideItems = root.querySelectorAll<HTMLElement>('.side-item[data-select]');
+
+    function show(id: string) {
+      panels.forEach((panel) => {
+        const active = panel.dataset.panel === id;
+        panel.hidden = !active;
+        if (!active) return;
+
+        // Re-trigger the staggered entrance on every switch.
+        panel.querySelectorAll<HTMLElement>('.card').forEach((card, i) => {
+          card.style.animation = 'none';
+          void card.offsetWidth; // force reflow so the animation restarts
+          card.style.animation = '';
+          card.style.animationDelay = `${Math.min(i, 8) * 55}ms`;
+        });
+      });
+
+      sideItems.forEach((item) => {
+        const active = item.dataset.select === id;
+        item.classList.toggle('active', active);
+        if (active) item.setAttribute('aria-current', 'true');
+        else item.removeAttribute('aria-current');
+      });
+    }
+
+    // Sidebar entries and overview cards both select.
+    root.querySelectorAll<HTMLElement>('[data-select]').forEach((el) => {
+      el.addEventListener('click', () => show(el.dataset.select!));
+    });
+  }
+</script>
+
+<style>
+  .browser {
+    display: grid;
+    grid-template-columns: 15rem 1fr;
+    gap: var(--sp-5);
+    align-items: start;
+  }
+
+  /* ---------- sidebar ---------- */
+
+  .side {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1px;
+    border-left: 2px solid var(--border);
+    padding-left: var(--sp-3);
+    position: sticky;
+    top: 72px;
+  }
+
+  .side-label {
+    color: var(--faint);
+    font-size: var(--step--2);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin: var(--sp-3) 0 var(--sp-1);
+  }
+
+  .side-item {
+    font: inherit;
+    font-size: var(--step--1);
+    text-align: left;
+    color: var(--dim);
+    background: transparent;
+    border: 0;
+    border-radius: 4px;
+    padding: var(--sp-1) var(--sp-2);
+    cursor: pointer;
+    transition: color 0.15s ease, background 0.15s ease, transform 0.15s ease;
+  }
+
+  .side-item:hover {
+    color: var(--ink);
+    background: var(--surface);
+    transform: translateX(2px);
+  }
+
+  .side-item.active {
+    color: var(--accent);
+    background: var(--surface);
+    font-weight: 700;
+  }
+
+  /* ---------- cards ---------- */
+
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+    gap: var(--sp-3);
+  }
+
+  .cards[hidden] {
+    display: none;
+  }
+
+  .card {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    animation: card-in 0.34s ease-out both;
+  }
+
+  .card.wide {
+    grid-column: 1 / -1;
+  }
+
+  .card.as-link {
+    font: inherit;
+    color: inherit;
+    cursor: pointer;
+    transition: border-color 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease;
+  }
+
+  .card.as-link:hover {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+    box-shadow: 0 12px 24px -18px var(--shadow);
+  }
+
+  .card-head {
+    display: flex;
+    align-items: baseline;
+    gap: var(--sp-2);
+    padding: var(--sp-2) var(--sp-3);
+    background: var(--raised);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .i {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+    fill: var(--dim);
+    transform: translateY(2px);
+  }
+
+  .card-name {
+    font-weight: 700;
+    font-size: var(--step--1);
+    /* Project titles are long; wrap them rather than truncating. */
+    line-height: 1.35;
+  }
+
+  .card-year {
+    margin-left: auto;
+    color: var(--faint);
+    font-size: var(--step--2);
+    flex-shrink: 0;
+  }
+
+  .card-body {
+    padding: var(--sp-3);
+    color: var(--ink);
+  }
+
+  .card.as-link .card-body {
+    color: var(--dim);
+  }
+
+  .card .tags {
+    margin: 0;
+  }
+
+  @keyframes card-in {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+  }
+
+  @media (max-width: 720px) {
+    .browser {
+      grid-template-columns: 1fr;
+    }
+
+    /* On narrow screens the sidebar becomes a horizontally scrollable strip,
+       rather than nine stacked lines pushing the cards off-screen. */
+    .side {
+      position: static;
+      flex-direction: row;
+      flex-wrap: nowrap;
+      align-items: center;
+      gap: var(--sp-1);
+      border-left: 0;
+      border-bottom: 2px solid var(--border);
+      padding: 0 0 var(--sp-3);
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+
+    .side::-webkit-scrollbar {
+      display: none;
+    }
+
+    .side-label {
+      display: none;
+    }
+
+    .side-item {
+      white-space: nowrap;
+      border: 1px solid var(--border);
+    }
+
+    .side-item:hover {
+      transform: none;
+    }
+  }
+</style>

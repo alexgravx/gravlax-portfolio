@@ -1,19 +1,21 @@
 ---
 import '../styles/theme.css';
-import { profile, education, skills, experience, projects, clubs, resumePdf } from '../content/resume';
+import { profile, education, skills, experience, projects, resumePdf } from '../content/resume';
 
-const allRoles = [...experience, ...clubs];
+// The resume shows the two projects the PDF actually lists; the rest live on the portfolio.
+const listed = projects.filter((p) => p.onResume);
 ---
 
 <!doctype html>
-<html lang="en" data-palette="beige">
+<html lang="en" data-theme="light">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>{profile.name} — Resume</title>
     <meta
       name="description"
-      content={`Resume of ${profile.name}: past experience, education, skills and projects.`}
+      content={`Resume of ${profile.name}: experience, education, skills and projects.`}
     />
     <link
       rel="preload"
@@ -24,9 +26,13 @@ const allRoles = [...experience, ...clubs];
     />
   </head>
   <body>
+    <div class="screen-mesh"></div>
+
     <aside class="notice">
-      <span>This page is designed to print onto a single Letter page.</span>
-      <a href={resumePdf}>Download the PDF</a> · <a href="/">back to portfolio</a>
+      <span>Designed to print onto a single Letter page.</span>
+      <span class="notice-links">
+        <a href={resumePdf}>download the PDF</a> · <a href="/">back to portfolio</a>
+      </span>
     </aside>
 
     <main class="sheet">
@@ -54,11 +60,11 @@ const allRoles = [...experience, ...clubs];
                 <span class="meta">{e.location}</span>
                 <span class="date">{e.date}</span>
               </div>
-              <div class="degree">
+              <div>
                 <em>{e.degree}</em>
                 {e.note && <span class="meta">, {e.note}</span>}
               </div>
-              {e.coursework && <p class="course">Coursework: {e.coursework.join(', ')}.</p>}
+              {e.coursework && <p class="meta">Coursework: {e.coursework.join(', ')}.</p>}
             </article>
           ))
         }
@@ -78,7 +84,7 @@ const allRoles = [...experience, ...clubs];
       <section>
         <h2>Experience</h2>
         {
-          allRoles.map((r) => (
+          experience.map((r) => (
             <article class="item">
               <div class="item-head">
                 <strong>
@@ -119,20 +125,20 @@ const allRoles = [...experience, ...clubs];
       <section>
         <h2>Projects</h2>
         {
-          projects.map((p) => (
+          listed.map((p) => (
             <article class="item">
               <div class="item-head">
                 <strong>{p.name}</strong>
-                {p.href && p.hrefLabel && (
+                {p.links?.[0] && (
                   <span class="meta">
-                    <a href={p.href} target="_blank" rel="noopener noreferrer">
-                      {p.hrefLabel}
+                    <a href={p.links[0].href} target="_blank" rel="noopener noreferrer">
+                      {p.links[0].label}
                     </a>
                   </span>
                 )}
               </div>
-              <p class="blurb">
-                {p.blurb} <span class="meta">Built with {p.stack.join(', ')}.</span>
+              <p>
+                {p.about} <span class="meta">Built with {p.stack.join(', ')}.</span>
               </p>
             </article>
           ))
@@ -151,6 +157,7 @@ const allRoles = [...experience, ...clubs];
   .notice {
     display: flex;
     flex-wrap: wrap;
+    justify-content: space-between;
     gap: 0 1ch;
     max-width: 8.5in;
     margin: 0 auto;
@@ -158,6 +165,11 @@ const allRoles = [...experience, ...clubs];
     color: var(--dim);
     font-size: var(--step--1);
     border-bottom: 1px dashed var(--border);
+  }
+
+  .notice-links {
+    display: flex;
+    gap: 1ch;
   }
 
   .sheet {
@@ -221,16 +233,9 @@ const allRoles = [...experience, ...clubs];
     color: var(--dim);
   }
 
-  .degree,
-  .course,
-  .blurb,
-  .skill {
+  p {
     margin: 1px 0;
     max-width: none;
-  }
-
-  .course {
-    color: var(--dim);
   }
 
   ul {
@@ -265,11 +270,10 @@ const allRoles = [...experience, ...clubs];
     body {
       background: #fff;
       color: #000;
-      text-shadow: none;
     }
 
     .notice,
-    :global(.screen-mesh) {
+    .screen-mesh {
       display: none;
     }
 
@@ -287,7 +291,6 @@ const allRoles = [...experience, ...clubs];
     .meta,
     .date,
     .role,
-    .course,
     li::before {
       color: #444;
     }
