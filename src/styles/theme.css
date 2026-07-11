@@ -1,0 +1,316 @@
+/* ---------------------------------------------------------------
+   Design tokens. Palette is switched by [data-palette] on <html>.
+   --------------------------------------------------------------- */
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: url('/fonts/jetbrains-mono-latin-wght-normal.woff2') format('woff2-variations');
+  font-weight: 100 800;
+  font-display: swap;
+  font-style: normal;
+}
+
+:root {
+  --mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  --step--1: clamp(0.72rem, 0.69rem + 0.14vw, 0.8rem);
+  --step-0: clamp(0.85rem, 0.81rem + 0.2vw, 0.95rem);
+  --step-1: clamp(1rem, 0.93rem + 0.35vw, 1.2rem);
+  --step-2: clamp(1.3rem, 1.15rem + 0.75vw, 1.8rem);
+
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 24px;
+  --sp-6: 32px;
+  --sp-7: 48px;
+  --sp-8: 64px;
+
+  --measure: 74ch;
+  --glow: none;
+  --scanlines: none;
+}
+
+/* 1 — Retro beige. The simon.lecoq.io look: warm, old-computer, premium. */
+:root,
+[data-palette='beige'] {
+  --bg: #cbc7af;
+  --surface: #d7d2b8;
+  --ink: #4b4a3f;
+  --dim: #77755f;
+  --faint: #9d9a83;
+  --border: #b3ae99;
+  --accent: #003a6b;
+  --accent-hover: #477698;
+  --warn: #8a6d3b;
+  --mesh: rgba(0, 0, 0, 0.05);
+  --selection: rgba(0, 58, 107, 0.2);
+}
+
+/* 2 — Near-black + a single green accent. Modern hacker, high legibility. */
+[data-palette='dark'] {
+  --bg: #0a0a0b;
+  --surface: #121215;
+  --ink: #e8e6e3;
+  --dim: #8b8b93;
+  --faint: #55555e;
+  --border: #26262b;
+  --accent: #4ade80;
+  --accent-hover: #86efac;
+  --warn: #fbbf24;
+  --mesh: rgba(0, 0, 0, 0.35);
+  --selection: rgba(74, 222, 128, 0.25);
+}
+
+/* 3 — Phosphor CRT. Full green-on-black, with bloom and scanlines. */
+[data-palette='crt'] {
+  --bg: #020d02;
+  --surface: #041804;
+  --ink: #33ff33;
+  --dim: #1f9e1f;
+  --faint: #146614;
+  --border: #0d5a0d;
+  --accent: #7cff7c;
+  --accent-hover: #b6ffb6;
+  --warn: #ffe066;
+  --mesh: rgba(0, 0, 0, 0.45);
+  --selection: rgba(51, 255, 51, 0.3);
+  --glow: 0 0 6px rgba(51, 255, 51, 0.45);
+  --scanlines: repeating-linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0) 0px,
+    rgba(0, 0, 0, 0) 2px,
+    rgba(0, 0, 0, 0.18) 3px,
+    rgba(0, 0, 0, 0.18) 4px
+  );
+}
+
+/* ---------------------------------------------------------------
+   Base
+   --------------------------------------------------------------- */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background-color: var(--bg);
+  color: var(--ink);
+  font-family: var(--mono);
+  font-size: var(--step-0);
+  line-height: 1.65;
+  text-shadow: var(--glow);
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+::selection {
+  background: var(--selection);
+}
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+}
+
+a:hover,
+a:focus-visible {
+  color: var(--accent-hover);
+  border-bottom-color: currentColor;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+h1,
+h2,
+h3 {
+  font-weight: 700;
+  line-height: 1.25;
+  margin: 0;
+}
+
+p {
+  margin: 0 0 var(--sp-4);
+  max-width: var(--measure);
+}
+
+/* ---------------------------------------------------------------
+   The screen mesh — the highest-leverage effect on simon.lecoq.io.
+   A fixed, non-interactive grid laid over the entire page so the
+   site reads as something displayed ON a screen. Pure CSS.
+   --------------------------------------------------------------- */
+
+.screen-mesh {
+  position: fixed;
+  inset: 0;
+  z-index: 500;
+  pointer-events: none;
+  background-image:
+    linear-gradient(90deg, transparent, transparent 3px, var(--mesh) 4px),
+    linear-gradient(transparent, transparent 3px, var(--mesh) 4px);
+  background-size: 4px 4px;
+}
+
+.screen-mesh::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: var(--scanlines);
+}
+
+/* ---------------------------------------------------------------
+   Shared terminal primitives
+   --------------------------------------------------------------- */
+
+.wrap {
+  max-width: 88ch;
+  margin: 0 auto;
+  padding: var(--sp-6) var(--sp-4);
+}
+
+/* A shell prompt line: `visitor@gravlax:~$ command` */
+.prompt-line {
+  display: flex;
+  gap: 0.6ch;
+  flex-wrap: wrap;
+  align-items: baseline;
+}
+
+.prompt-user {
+  color: var(--accent);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.prompt-cmd {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+/* Dim comment text, e.g. `# a note` */
+.comment {
+  color: var(--dim);
+}
+
+.rule {
+  border: 0;
+  border-top: 1px dashed var(--border);
+  margin: var(--sp-6) 0;
+}
+
+/* Tag chips for tech stacks: [Python] [Docker] */
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  list-style: none;
+  margin: var(--sp-3) 0 0;
+  padding: 0;
+}
+
+.tags li {
+  color: var(--dim);
+  font-size: var(--step--1);
+}
+
+.tags li::before {
+  content: '[';
+}
+
+.tags li::after {
+  content: ']';
+}
+
+/* Rendered command output / resume entries.
+   Global (not scoped) because commands.ts injects this markup at runtime. */
+
+.entry {
+  margin-bottom: var(--sp-5);
+  max-width: var(--measure);
+}
+
+.entry:last-child {
+  margin-bottom: 0;
+}
+
+.entry-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--sp-3);
+  flex-wrap: wrap;
+}
+
+.bullets {
+  list-style: none;
+  margin: var(--sp-2) 0 0;
+  padding: 0;
+}
+
+.bullets li {
+  position: relative;
+  padding-left: 2.2ch;
+  margin-bottom: var(--sp-2);
+}
+
+.bullets li::before {
+  content: '▸';
+  position: absolute;
+  left: 0;
+  color: var(--accent);
+}
+
+.bullets .bullets {
+  margin-top: var(--sp-2);
+}
+
+.bullets .bullets li::before {
+  content: '·';
+  color: var(--faint);
+}
+
+.cmd-name {
+  color: var(--accent);
+  font-weight: 700;
+  white-space: pre;
+}
+
+.warn {
+  color: var(--warn);
+}
+
+.blink {
+  animation: blink 1.1s step-end infinite;
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -1,0 +1,156 @@
+---
+import '../styles/theme.css';
+
+interface Props {
+  title: string;
+  variant: 'a' | 'b' | 'c';
+}
+
+const { title, variant } = Astro.props;
+
+const variants = [
+  { id: 'a', name: 'Hybrid' },
+  { id: 'b', name: 'Pure REPL' },
+  { id: 'c', name: 'Scroll-only' },
+];
+
+const palettes = [
+  { id: 'beige', key: '1', name: 'Retro beige' },
+  { id: 'dark', key: '2', name: 'Near-black' },
+  { id: 'crt', key: '3', name: 'Phosphor CRT' },
+];
+---
+
+<!doctype html>
+<html lang="en" data-palette="beige">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>{title} — mockup</title>
+    <link
+      rel="preload"
+      href="/fonts/jetbrains-mono-latin-wght-normal.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+  </head>
+  <body>
+    <div class="screen-mesh"></div>
+
+    <!-- Mockup-only chrome. Deleted along with /mock once a direction is chosen. -->
+    <aside class="switcher">
+      <div class="switcher-row">
+        <span class="switcher-label">nav</span>
+        {
+          variants.map((v) => (
+            <a href={`/mock/${v.id}`} class:list={['chip', { on: v.id === variant }]}>
+              {v.id.toUpperCase()} · {v.name}
+            </a>
+          ))
+        }
+      </div>
+      <div class="switcher-row">
+        <span class="switcher-label">palette</span>
+        {
+          palettes.map((p) => (
+            <button type="button" class="chip" data-set-palette={p.id}>
+              {p.key} · {p.name}
+            </button>
+          ))
+        }
+      </div>
+    </aside>
+
+    <slot />
+
+    <script>
+      const KEY = 'mock-palette';
+      const byKey: Record<string, string> = { '1': 'beige', '2': 'dark', '3': 'crt' };
+
+      function apply(palette: string) {
+        document.documentElement.dataset.palette = palette;
+        localStorage.setItem(KEY, palette);
+        document.querySelectorAll<HTMLElement>('[data-set-palette]').forEach((el) => {
+          el.classList.toggle('on', el.dataset.setPalette === palette);
+        });
+      }
+
+      apply(localStorage.getItem(KEY) ?? 'beige');
+
+      document.querySelectorAll<HTMLElement>('[data-set-palette]').forEach((el) => {
+        el.addEventListener('click', () => apply(el.dataset.setPalette!));
+      });
+
+      // Keys 1/2/3 switch palette — but never while typing into the prompt.
+      addEventListener('keydown', (e) => {
+        const el = e.target as HTMLElement;
+        if (el.tagName === 'INPUT' || el.isContentEditable) return;
+        const next = byKey[e.key];
+        if (next) apply(next);
+      });
+    </script>
+
+    <style>
+      .switcher {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 600;
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--sp-2) var(--sp-5);
+        padding: var(--sp-2) var(--sp-4);
+        background: var(--surface);
+        border-bottom: 1px solid var(--border);
+        font-size: var(--step--1);
+      }
+
+      .switcher-row {
+        display: flex;
+        align-items: center;
+        gap: var(--sp-2);
+        flex-wrap: wrap;
+      }
+
+      .switcher-label {
+        color: var(--faint);
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+      }
+
+      .chip {
+        font: inherit;
+        color: var(--dim);
+        background: transparent;
+        border: 1px solid var(--border);
+        padding: 1px var(--sp-2);
+        cursor: pointer;
+      }
+
+      .chip:hover {
+        color: var(--ink);
+        border-color: var(--ink);
+      }
+
+      .chip.on {
+        color: var(--bg);
+        background: var(--accent);
+        border-color: var(--accent);
+      }
+
+      /* Push page content clear of the fixed switcher bar. */
+      :global(body) {
+        padding-top: 76px;
+      }
+
+      @media (max-width: 640px) {
+        :global(body) {
+          padding-top: 96px;
+        }
+      }
+    </style>
+  </body>
+</html>

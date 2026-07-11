@@ -1,0 +1,295 @@
+---
+import '../styles/theme.css';
+import { profile, education, skills, experience, projects, clubs, resumePdf } from '../content/resume';
+
+const allRoles = [...experience, ...clubs];
+---
+
+<!doctype html>
+<html lang="en" data-palette="beige">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{profile.name} — Resume</title>
+    <meta
+      name="description"
+      content={`Resume of ${profile.name}: past experience, education, skills and projects.`}
+    />
+    <link
+      rel="preload"
+      href="/fonts/jetbrains-mono-latin-wght-normal.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
+  </head>
+  <body>
+    <aside class="notice">
+      <span>This page is designed to print onto a single Letter page.</span>
+      <a href={resumePdf}>Download the PDF</a> · <a href="/">back to portfolio</a>
+    </aside>
+
+    <main class="sheet">
+      <header class="head">
+        <h1>{profile.name}</h1>
+        <p class="role">{profile.title} — {profile.location}</p>
+        <nav class="links">
+          {
+            profile.links.map((l) => (
+              <a href={l.href} target="_blank" rel="noopener noreferrer">
+                {l.href.replace(/^https?:\/\//, '')}
+              </a>
+            ))
+          }
+        </nav>
+      </header>
+
+      <section>
+        <h2>Education</h2>
+        {
+          education.map((e) => (
+            <article class="item">
+              <div class="item-head">
+                <strong>{e.school}</strong>
+                <span class="meta">{e.location}</span>
+                <span class="date">{e.date}</span>
+              </div>
+              <div class="degree">
+                <em>{e.degree}</em>
+                {e.note && <span class="meta">, {e.note}</span>}
+              </div>
+              {e.coursework && <p class="course">Coursework: {e.coursework.join(', ')}.</p>}
+            </article>
+          ))
+        }
+      </section>
+
+      <section>
+        <h2>Technical Skills</h2>
+        {
+          Object.entries(skills).map(([group, items]) => (
+            <p class="skill">
+              <strong>{group}:</strong> {items.join(', ')}
+            </p>
+          ))
+        }
+      </section>
+
+      <section>
+        <h2>Experience</h2>
+        {
+          allRoles.map((r) => (
+            <article class="item">
+              <div class="item-head">
+                <strong>
+                  {r.href ? (
+                    <a href={r.href} target="_blank" rel="noopener noreferrer">
+                      {r.org}
+                    </a>
+                  ) : (
+                    r.org
+                  )}
+                </strong>
+                <span class="meta">
+                  {r.title} — {r.location}
+                </span>
+                <span class="date">
+                  {r.start} – {r.end}
+                </span>
+              </div>
+              <ul>
+                {r.bullets.map((b) => (
+                  <li>
+                    {b.text}
+                    {b.children && (
+                      <ul class="sub">
+                        {b.children.map((c) => (
+                          <li>{c}</li>
+                        ))}
+                      </ul>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </article>
+          ))
+        }
+      </section>
+
+      <section>
+        <h2>Projects</h2>
+        {
+          projects.map((p) => (
+            <article class="item">
+              <div class="item-head">
+                <strong>{p.name}</strong>
+                {p.href && p.hrefLabel && (
+                  <span class="meta">
+                    <a href={p.href} target="_blank" rel="noopener noreferrer">
+                      {p.hrefLabel}
+                    </a>
+                  </span>
+                )}
+              </div>
+              <p class="blurb">
+                {p.blurb} <span class="meta">Built with {p.stack.join(', ')}.</span>
+              </p>
+            </article>
+          ))
+        }
+      </section>
+    </main>
+  </body>
+</html>
+
+<style>
+  body {
+    background: var(--surface);
+    line-height: 1.45;
+  }
+
+  .notice {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 1ch;
+    max-width: 8.5in;
+    margin: 0 auto;
+    padding: var(--sp-3) var(--sp-5);
+    color: var(--dim);
+    font-size: var(--step--1);
+    border-bottom: 1px dashed var(--border);
+  }
+
+  .sheet {
+    max-width: 8.5in;
+    margin: 0 auto;
+    padding: 0.5in 0.6in;
+    font-size: 10.5px;
+  }
+
+  .head {
+    text-align: center;
+    margin-bottom: var(--sp-4);
+  }
+
+  .head h1 {
+    font-size: 20px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .role {
+    margin: 2px 0;
+    color: var(--dim);
+  }
+
+  .links {
+    display: flex;
+    justify-content: center;
+    gap: var(--sp-3);
+    flex-wrap: wrap;
+  }
+
+  h2 {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    border-bottom: 1px solid var(--ink);
+    padding-bottom: 1px;
+    margin: var(--sp-4) 0 var(--sp-2);
+  }
+
+  .item {
+    margin-bottom: var(--sp-3);
+    break-inside: avoid;
+  }
+
+  .item-head {
+    display: flex;
+    align-items: baseline;
+    gap: 0.8ch;
+    flex-wrap: wrap;
+  }
+
+  .date {
+    margin-left: auto;
+    color: var(--dim);
+    white-space: nowrap;
+  }
+
+  .meta {
+    color: var(--dim);
+  }
+
+  .degree,
+  .course,
+  .blurb,
+  .skill {
+    margin: 1px 0;
+    max-width: none;
+  }
+
+  .course {
+    color: var(--dim);
+  }
+
+  ul {
+    margin: 2px 0 0;
+    padding-left: 1.4ch;
+    list-style: none;
+  }
+
+  li {
+    position: relative;
+    padding-left: 1.6ch;
+    margin-bottom: 1px;
+  }
+
+  li::before {
+    content: '▪';
+    position: absolute;
+    left: 0;
+    color: var(--dim);
+  }
+
+  .sub li::before {
+    content: '–';
+  }
+
+  @media print {
+    @page {
+      size: letter;
+      margin: 0.4in;
+    }
+
+    body {
+      background: #fff;
+      color: #000;
+      text-shadow: none;
+    }
+
+    .notice,
+    :global(.screen-mesh) {
+      display: none;
+    }
+
+    .sheet {
+      max-width: none;
+      padding: 0;
+      font-size: 9.2px;
+    }
+
+    a {
+      color: #000;
+      border: 0;
+    }
+
+    .meta,
+    .date,
+    .role,
+    .course,
+    li::before {
+      color: #444;
+    }
+  }
+</style>

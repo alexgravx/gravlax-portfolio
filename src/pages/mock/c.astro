@@ -1,0 +1,46 @@
+---
+import Mock from '../../layouts/Mock.astro';
+import Banner from '../../components/Banner.astro';
+import Sections from '../../components/Sections.astro';
+import { profile, resumePdf } from '../../content/resume';
+
+const nav = ['about', 'experience', 'projects', 'skills', 'education', 'clubs', 'contact'];
+---
+
+<Mock title="C — Scroll-only" variant="c">
+  <main class="wrap">
+    <Banner />
+
+    <p class="comment">
+      {profile.title} · {profile.location}
+    </p>
+
+    <nav class="links">
+      {nav.map((id) => <a href={`#${id}`}>[{id}]</a>)}
+      <a href="/resume">[resume]</a>
+      <a href={resumePdf}>[pdf]</a>
+    </nav>
+
+    <hr class="rule" />
+
+    <Sections style="plain" />
+
+    <hr class="rule" />
+    <p class="comment foot">
+      # {profile.name} — built with Astro. No trackers, no cookies.
+    </p>
+  </main>
+</Mock>
+
+<style>
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-3);
+    margin-top: var(--sp-3);
+  }
+
+  .foot {
+    margin-bottom: 0;
+  }
+</style>

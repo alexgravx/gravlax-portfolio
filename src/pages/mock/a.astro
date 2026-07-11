@@ -1,0 +1,48 @@
+---
+import Mock from '../../layouts/Mock.astro';
+import Banner from '../../components/Banner.astro';
+import Sections from '../../components/Sections.astro';
+import Repl from '../../components/Repl.astro';
+import { profile } from '../../content/resume';
+---
+
+<Mock title="A — Hybrid" variant="a">
+  <main class="wrap">
+    <Banner />
+
+    <p class="tagline">
+      <span class="prompt-user">visitor@gravlax:~$</span>
+      <span class="prompt-cmd">./portfolio --start</span>
+    </p>
+    <p class="comment">
+      # {profile.title} · {profile.location} · scroll, or use the prompt below.
+    </p>
+
+    <hr class="rule" />
+
+    <Sections style="shell" />
+
+    <hr class="rule" />
+    <p class="comment foot"># end of file. <span class="blink">█</span></p>
+  </main>
+
+  <Repl mode="docked" greeting={false} />
+</Mock>
+
+<style>
+  .wrap {
+    /* Clear the docked prompt so the last section is never hidden behind it. */
+    padding-bottom: 40vh;
+  }
+
+  .tagline {
+    display: flex;
+    gap: 0.8ch;
+    flex-wrap: wrap;
+    margin-bottom: var(--sp-2);
+  }
+
+  .foot {
+    margin-bottom: 0;
+  }
+</style>

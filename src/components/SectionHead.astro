@@ -1,0 +1,60 @@
+---
+/**
+ * Section header. Either a shell command line (`$ cat experience.md`)
+ * or a jacquin.xyz-style plain rule (`-- EXPERIENCE ----------`).
+ */
+interface Props {
+  style: 'shell' | 'plain';
+  id: string;
+  cmd: string;
+}
+
+const { style, id, cmd } = Astro.props;
+---
+
+{
+  style === 'shell' ? (
+    <h2 class="head shell">
+      <span class="prompt-user">$</span>
+      <span class="prompt-cmd">{cmd}</span>
+      <span class="sr-only"> — {id}</span>
+    </h2>
+  ) : (
+    <h2 class="head plain">
+      <span>-- {id.toUpperCase()}</span>
+      <span class="dashes" aria-hidden="true"></span>
+    </h2>
+  )
+}
+
+<style>
+  .head {
+    display: flex;
+    align-items: baseline;
+    gap: 0.8ch;
+    font-size: var(--step-0);
+    margin-bottom: var(--sp-4);
+  }
+
+  .head.plain {
+    color: var(--dim);
+    letter-spacing: 0.08em;
+  }
+
+  .dashes {
+    flex: 1;
+    border-bottom: 1px dashed var(--border);
+    transform: translateY(-0.3em);
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+</style>

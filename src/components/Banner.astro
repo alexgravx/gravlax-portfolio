@@ -1,0 +1,70 @@
+---
+/**
+ * ASCII wordmark (figlet "ANSI Shadow").
+ * The art is ~83 columns wide, so it is swapped for a plain heading
+ * on narrow screens rather than being scaled into illegibility.
+ */
+const art = String.raw`
+ █████╗ ██╗     ███████╗██╗  ██╗ █████╗ ███╗   ██╗██████╗ ██████╗ ███████╗
+██╔══██╗██║     ██╔════╝╚██╗██╔╝██╔══██╗████╗  ██║██╔══██╗██╔══██╗██╔════╝
+███████║██║     █████╗   ╚███╔╝ ███████║██╔██╗ ██║██║  ██║██████╔╝█████╗
+██╔══██║██║     ██╔══╝   ██╔██╗ ██╔══██║██║╚██╗██║██║  ██║██╔══██╗██╔══╝
+██║  ██║███████╗███████╗██╔╝ ██╗██║  ██║██║ ╚████║██████╔╝██║  ██║███████╗
+╚═╝  ╚═╝╚══════╝╚══════╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═════╝ ╚═════╝ ╚═╝  ╚═╝╚══════╝
+ ██████╗ ██████╗  █████╗ ██╗   ██╗███████╗██████╗ ███████╗ █████╗ ██╗   ██╗██╗  ██╗
+██╔════╝ ██╔══██╗██╔══██╗██║   ██║██╔════╝██╔══██╗██╔════╝██╔══██╗██║   ██║╚██╗██╔╝
+██║  ███╗██████╔╝███████║██║   ██║█████╗  ██████╔╝█████╗  ███████║██║   ██║ ╚███╔╝
+██║   ██║██╔══██╗██╔══██║╚██╗ ██╔╝██╔══╝  ██╔══██╗██╔══╝  ██╔══██║██║   ██║ ██╔██╗
+╚██████╔╝██║  ██║██║  ██║ ╚████╔╝ ███████╗██║  ██║███████╗██║  ██║╚██████╔╝██╔╝ ██╗
+ ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝  ╚═══╝  ╚══════╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═╝`;
+---
+
+<div class="banner">
+  <pre class="banner-art" aria-hidden="true">{art}</pre>
+  <h1 class="banner-text">Alexandre Gravereaux</h1>
+  <p class="sr-only">Alexandre Gravereaux</p>
+</div>
+
+<style>
+  .banner {
+    margin-bottom: var(--sp-5);
+  }
+
+  .banner-art {
+    margin: 0;
+    font-size: clamp(6px, 1.02vw, 11px);
+    line-height: 1.06;
+    color: var(--ink);
+    overflow: hidden;
+    white-space: pre;
+  }
+
+  .banner-text {
+    display: none;
+    font-size: var(--step-2);
+    letter-spacing: -0.02em;
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  /* Below ~768px the 83-column art cannot be read. Show the name instead. */
+  @media (max-width: 767px) {
+    .banner-art,
+    .sr-only {
+      display: none;
+    }
+
+    .banner-text {
+      display: block;
+    }
+  }
+</style>
