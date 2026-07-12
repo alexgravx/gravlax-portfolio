@@ -33,25 +33,11 @@ const windows = [
 
   <span class="right">
     <a class="win extra" href="/resume">resume</a>
-    <time class="clock" data-clock aria-hidden="true">--:--</time>
     <ThemeToggle />
   </span>
 </nav>
 
 <script>
-  // Clock
-  const clock = document.querySelector<HTMLElement>('[data-clock]');
-  function tick() {
-    if (!clock) return;
-    clock.textContent = new Date().toLocaleTimeString([], {
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: false,
-    });
-  }
-  tick();
-  setInterval(tick, 15_000);
-
   // Scroll-spy: highlight the window whose section is currently in view.
   const wins = document.querySelectorAll<HTMLElement>('[data-win]');
   const targets = [...wins]
@@ -95,8 +81,8 @@ const windows = [
   }
 
   .session {
-    color: var(--accent-ink);
-    background: var(--accent);
+    color: var(--chrome-ink);
+    background: var(--chrome);
     font-weight: 700;
     padding: 0 var(--sp-2);
     flex-shrink: 0;
@@ -135,8 +121,8 @@ const windows = [
 
   /* tmux marks the active window with a reversed block. */
   .win.active {
-    color: var(--accent-ink);
-    background: var(--accent);
+    color: var(--chrome-ink);
+    background: var(--chrome);
     font-weight: 700;
   }
 
@@ -152,14 +138,8 @@ const windows = [
     flex-shrink: 0;
   }
 
-  .clock {
-    color: var(--faint);
-    font-variant-numeric: tabular-nums;
-  }
-
   @media (max-width: 720px) {
     .session,
-    .clock,
     .extra {
       display: none;
     }

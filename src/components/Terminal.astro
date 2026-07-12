@@ -4,29 +4,40 @@ import { profile } from '../content/resume';
 /**
  * The terminal window. It is the whole first screen.
  *
- * The opening output is a neofetch-style block: ASCII monogram on the left,
- * system info on the right. The cursor is a real inverse-video block that
- * tracks the caret position (safe in `ch` units because the font is monospace).
+ * It runs a small real shell over a virtual filesystem (see scripts/fs.ts):
+ * ls / cd / cat / tree / pwd all work, and the prompt reflects the cwd.
+ * The cursor is a true inverse-video block that sits ON the character at the
+ * caret — safe in `ch` units because the font is monospace.
  */
 
-const logo = String.raw` █████╗  ██████╗
-██╔══██╗██╔════╝
-███████║██║  ███╗
-██╔══██║██║   ██║
-██║  ██║╚██████╔╝
-╚═╝  ╚═╝ ╚═════╝`;
+// Built line-by-line rather than as one template literal: a backtick cannot be
+// escaped inside String.raw without the backslash surviving into the output,
+// which is what turned the salmon into punctuation soup. Apostrophes it is.
+const logo = [
+  ' █████╗  ██████╗',
+  '██╔══██╗██╔════╝',
+  '███████║██║  ███╗',
+  '██╔══██║██║   ██║',
+  '██║  ██║╚██████╔╝',
+  '╚═╝  ╚═╝ ╚═════╝',
+  '',
+  "      /\"*._         _",
+  "  .-*'      '*-.._.-'/",
+  ' < * ))     ,       (',
+  '  \'*-._\'._(__.--*"\'.\\;',
+  "       ';/     ''--'",
+].join('\n');
 
 const info: Array<[string, string]> = [
   ['name', profile.name],
   ['role', profile.title],
   ['location', profile.location],
   ['edu', 'MEng Computer Science, Cornell Tech'],
-  ['prev', 'Forvis Mazars · Paris Digital Lab · ViaRézo'],
   ['shell', 'zsh'],
-  ['theme', 'gravlax-dark'],
+  ['theme', 'gravlax'],
 ];
 
-const promptLabel = `visitor@${profile.handle}:~$`;
+const initialPrompt = `visitor@${profile.handle}:~$`;
 ---
 
 <section class="term" data-term aria-label="Interactive terminal">
@@ -39,10 +50,6 @@ const promptLabel = `visitor@${profile.handle}:~$`;
   <div class="term-body" data-body>
     <div class="term-log" data-log aria-live="polite">
       <div class="term-block">
-        <div class="term-cmdline">
-          <span class="term-prompt">{promptLabel}</span><span class="term-typed">neofetch</span>
-        </div>
-
         <div class="neofetch">
           <pre class="nf-logo" aria-hidden="true">{logo}</pre>
           <dl class="nf-info">
@@ -62,13 +69,15 @@ const promptLabel = `visitor@${profile.handle}:~$`;
         </div>
 
         <p class="term-hint comment">
-          Type <span class="cmd-name">help</span> for commands. <span class="term-hint-scroll">Scroll for the rest.</span>
+          Type <span class="cmd-name">help</span>, or poke around with{' '}
+          <span class="cmd-name">ls</span> and <span class="cmd-name">cd</span>.{' '}
+          <span class="term-hint-scroll">Scroll for the rest.</span>
         </p>
       </div>
     </div>
 
     <form class="term-form" data-form autocomplete="off">
-      <label class="term-prompt" for="term-input">{promptLabel}</label>
+      <label class="term-prompt" data-prompt for="term-input">{initialPrompt}</label>
       <span class="term-field">
         <input
           id="term-input"
@@ -87,7 +96,7 @@ const promptLabel = `visitor@${profile.handle}:~$`;
 </section>
 
 <script>
-  import { runCommand, commandNames, esc } from '../scripts/commands';
+  import { createShell, run, prompt, completions, esc } from '../scripts/commands';
 
   const term = document.querySelector<HTMLElement>('[data-term]');
 
@@ -97,24 +106,28 @@ const promptLabel = `visitor@${profile.handle}:~$`;
     const form = term.querySelector<HTMLFormElement>('[data-form]')!;
     const input = term.querySelector<HTMLInputElement>('[data-input]')!;
     const cursor = term.querySelector<HTMLElement>('[data-cursor]')!;
+    const promptEl = term.querySelector<HTMLElement>('[data-prompt]')!;
     const clearBtn = term.querySelector<HTMLButtonElement>('[data-clear]')!;
-    const label = term.querySelector<HTMLElement>('.term-prompt')!.textContent!;
 
+    const shell = createShell();
     const history: string[] = [];
-    let cursorIdx = 0;
+    let histIdx = 0;
 
-    /** Inverse-video block: sits ON the character at the caret. */
+    /** Inverse-video block, sitting on the character at the caret. */
     function drawCursor() {
       const at = input.selectionStart ?? input.value.length;
       cursor.style.transform = `translateX(${at}ch)`;
       cursor.textContent = input.value[at] ?? ' ';
-      // Restart the blink so the cursor is solid while actively typing.
       cursor.style.animation = 'none';
       void cursor.offsetWidth;
       cursor.style.animation = '';
     }
 
-    function emit(command: string, html: string | null) {
+    function syncPrompt() {
+      promptEl.textContent = prompt(shell);
+    }
+
+    function emit(command: string, html: string | null, label: string) {
       const block = document.createElement('div');
       block.className = 'term-block';
       block.innerHTML =
@@ -133,27 +146,28 @@ const promptLabel = `visitor@${profile.handle}:~$`;
     form.addEventListener('submit', (e) => {
       e.preventDefault();
       const raw = input.value;
+      const label = prompt(shell); // capture BEFORE cd changes it
 
-      // Bare Enter reprints the prompt on the next line, with no gap — like a shell.
       if (!raw.trim()) {
-        emit('', null);
+        emit('', null, label);
         input.value = '';
         drawCursor();
         return;
       }
 
       history.push(raw);
-      cursorIdx = history.length;
+      histIdx = history.length;
       input.value = '';
 
-      const { html } = runCommand(raw);
-      if (html === null) clear();
-      else emit(raw, html);
+      const result = run(shell, raw);
+      if (result.clear) clear();
+      else emit(raw, result.html, label);
+
+      syncPrompt();
       drawCursor();
     });
 
     input.addEventListener('keydown', (e) => {
-      // Ctrl+L clears the screen, as in any real terminal.
       if (e.ctrlKey && e.key.toLowerCase() === 'l') {
         e.preventDefault();
         clear();
@@ -163,18 +177,27 @@ const promptLabel = `visitor@${profile.handle}:~$`;
       if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
         e.preventDefault();
         if (!history.length) return;
-        cursorIdx = Math.max(0, Math.min(cursorIdx + (e.key === 'ArrowUp' ? -1 : 1), history.length));
-        input.value = history[cursorIdx] ?? '';
+        histIdx = Math.max(0, Math.min(histIdx + (e.key === 'ArrowUp' ? -1 : 1), history.length));
+        input.value = history[histIdx] ?? '';
         requestAnimationFrame(drawCursor);
         return;
       }
 
       if (e.key === 'Tab') {
         e.preventDefault();
-        const stem = input.value.trim().toLowerCase();
-        if (!stem) return;
-        const hit = commandNames.find((c) => c.startsWith(stem));
-        if (hit) input.value = hit;
+        // Complete the last word, so `cd pro<Tab>` works as well as `pro<Tab>`.
+        const parts = input.value.split(/(\s+)/);
+        const lastIdx = parts.length - 1;
+        const stem = (parts[lastIdx] ?? '').toLowerCase();
+        if (!stem.trim()) return;
+
+        const hit = completions(shell).find((c) => c.toLowerCase().startsWith(stem));
+        if (hit) {
+          parts[lastIdx] = hit;
+          input.value = parts.join('');
+          requestAnimationFrame(drawCursor);
+        }
+        return;
       }
 
       requestAnimationFrame(drawCursor);
@@ -191,6 +214,7 @@ const promptLabel = `visitor@${profile.handle}:~$`;
       input.focus();
     });
 
+    syncPrompt();
     drawCursor();
   }
 </script>
@@ -263,31 +287,7 @@ const promptLabel = `visitor@${profile.handle}:~$`;
     padding: var(--sp-4);
     cursor: text;
     scrollbar-width: thin;
-  }
-
-  /* A shell has no gaps between lines. Spacing comes from the output blocks. */
-  .term-block {
-    animation: rise 0.18s ease-out;
-  }
-
-  .term-cmdline {
-    display: flex;
-    gap: 0.8ch;
-    flex-wrap: wrap;
-  }
-
-  .term-out {
-    margin: var(--sp-2) 0 var(--sp-4);
-  }
-
-  .term-prompt {
-    color: var(--accent);
-    font-weight: 700;
-    white-space: nowrap;
-  }
-
-  .term-typed {
-    font-weight: 700;
+    line-height: 1.45;
   }
 
   /* ---------- neofetch ---------- */
@@ -295,7 +295,7 @@ const promptLabel = `visitor@${profile.handle}:~$`;
   .neofetch {
     display: flex;
     gap: var(--sp-5);
-    margin: var(--sp-3) 0 var(--sp-4);
+    margin-bottom: var(--sp-3);
     flex-wrap: wrap;
   }
 
@@ -319,10 +319,7 @@ const promptLabel = `visitor@${profile.handle}:~$`;
     font-weight: 700;
   }
 
-  .nf-user {
-    color: var(--accent);
-  }
-
+  .nf-user,
   .nf-host {
     color: var(--accent);
   }
@@ -358,7 +355,7 @@ const promptLabel = `visitor@${profile.handle}:~$`;
   .term-form {
     display: flex;
     align-items: baseline;
-    gap: 0.8ch;
+    gap: 1ch;
     margin-top: var(--sp-1);
   }
 
@@ -394,7 +391,6 @@ const promptLabel = `visitor@${profile.handle}:~$`;
     animation: blink 1.05s step-end infinite;
   }
 
-  /* Hollow the cursor out when the prompt is not focused, as terminals do. */
   .term-form:not(:focus-within) .term-cursor {
     background: transparent;
     color: transparent;
@@ -402,22 +398,9 @@ const promptLabel = `visitor@${profile.handle}:~$`;
     animation: none;
   }
 
-  @keyframes rise {
-    from {
-      opacity: 0;
-      transform: translateY(3px);
-    }
-  }
-
   @media (max-width: 640px) {
-    .term-title {
-      display: none;
-    }
-
-    .nf-logo {
-      display: none;
-    }
-
+    .term-title,
+    .nf-logo,
     .term-hint-scroll {
       display: none;
     }

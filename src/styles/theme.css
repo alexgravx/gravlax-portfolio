@@ -52,6 +52,13 @@
   --mesh: rgba(0, 0, 0, 0.05);
   --selection: rgba(31, 93, 143, 0.2);
   --shadow: rgba(75, 74, 63, 0.25);
+
+  /* "Chrome" — window title bars and the tmux status line. Deliberately NOT the
+     accent: a saturated blue at that size shouts. A deep warm beige recedes and
+     lets the accent stay special for links and the prompt. */
+  --chrome: #6d6a56;
+  --chrome-ink: #e6e2cd;
+  --chrome-dim: #b3ae99;
 }
 
 /* Dark — soft charcoal. Deliberately NOT pure black on pure white:
@@ -72,6 +79,10 @@
   --mesh: rgba(0, 0, 0, 0.28);
   --selection: rgba(98, 210, 148, 0.22);
   --shadow: rgba(0, 0, 0, 0.5);
+
+  --chrome: #32323c;
+  --chrome-ink: #cecbc4;
+  --chrome-dim: #7b7986;
 }
 
 /* ---------------------------------------------------------------
@@ -100,7 +111,7 @@ body {
   color: var(--ink);
   font-family: var(--mono);
   font-size: var(--step-0);
-  line-height: 1.65;
+  line-height: 1.5;
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
@@ -288,7 +299,74 @@ html.has-custom-cursor input {
   }
 }
 
-/* Rendered command output (injected at runtime by commands.ts, so global). */
+/* ---------------------------------------------------------------
+   Terminal output.
+
+   These MUST be global. Astro scopes component styles with a
+   [data-astro-cid-*] attribute stamped at build time — but the terminal
+   builds its echoed lines at runtime via innerHTML, so those nodes never
+   receive the attribute and scoped rules silently skip them. That is what
+   was eating the space after the `$` in echoed commands.
+   --------------------------------------------------------------- */
+
+.term-cmdline {
+  display: flex;
+  gap: 1ch;
+  flex-wrap: wrap;
+}
+
+.term-prompt {
+  color: var(--accent);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* Preserve the visitor's own spacing, exactly as a shell echoes it back. */
+.term-typed {
+  font-weight: 700;
+  white-space: pre-wrap;
+}
+
+.term-out {
+  margin: var(--sp-2) 0 var(--sp-4);
+}
+
+.term-block {
+  animation: rise 0.18s ease-out;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(3px);
+  }
+}
+
+/* `ls` / `tree` output */
+
+.fs-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 3ch;
+}
+
+.fs-dir {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.fs-file {
+  color: var(--ink);
+}
+
+.fs-glyph {
+  color: var(--faint);
+  white-space: pre;
+}
+
+.fs-tree {
+  line-height: 1.5;
+}
 
 .entry {
   margin-bottom: var(--sp-5);

@@ -12,13 +12,19 @@ import { projects } from '../content/resume';
 <div class="browser" data-projects>
   <aside class="side">
     <button type="button" class="side-item active" data-select="overview" aria-current="true">
-      overview
+      <span class="fill" aria-hidden="true"></span>
+      <span class="mark" aria-hidden="true">■</span>
+      <span class="txt">overview</span>
     </button>
     <span class="side-label">projects</span>
     {
       projects.map((p) => (
         <button type="button" class="side-item" data-select={p.id}>
-          {p.name}
+          <span class="fill" aria-hidden="true" />
+          <span class="mark" aria-hidden="true">
+            ■
+          </span>
+          <span class="txt">{p.name}</span>
         </button>
       ))
     }
@@ -193,10 +199,15 @@ import { projects } from '../content/resume';
     margin: var(--sp-3) 0 var(--sp-1);
   }
 
-  /* Sweep-fill hover, lifted from the aside on simon.lecoq.io: an over-wide
-     gradient parked on its right edge, slid to the left on hover so a solid
-     block wipes across the row — like a key being pressed. */
+  /* Sweep-fill hover, after the aside on simon.lecoq.io.
+     He animates `background-position` on an over-wide gradient, which repaints
+     the element every frame and visibly stutters when the pointer moves fast.
+     A transform on a pseudo-layer is composited on the GPU instead, so it stays
+     fluid however quickly you sweep across the list — and it reverses cleanly
+     mid-flight rather than snapping. */
   .side-item {
+    position: relative;
+    isolation: isolate;
     display: flex;
     align-items: baseline;
     gap: 1ch;
@@ -204,34 +215,47 @@ import { projects } from '../content/resume';
     font-size: var(--step--1);
     text-align: left;
     color: var(--dim);
+    background: transparent;
     border: 0;
     border-top: 1px solid transparent;
     border-bottom: 1px solid transparent;
     padding: var(--sp-1) var(--sp-2);
     cursor: pointer;
-    background: linear-gradient(to left, transparent 50%, var(--accent) 50%) right;
-    background-size: 250% 100%;
-    transition: background-position 0.45s ease-out, color 0.3s ease-out,
-      border-color 0.45s ease-out;
+    overflow: hidden;
+    transition: color 0.32s ease-out, border-color 0.32s ease-out;
   }
 
-  .side-item::before {
-    content: '■';
+  .fill {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: var(--chrome);
+    transform: scaleX(0);
+    transform-origin: right center;
+    transition: transform 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+    will-change: transform;
+  }
+
+  .mark {
     font-size: 0.7em;
     color: var(--faint);
-    transition: color 0.3s ease-out;
+    transition: color 0.32s ease-out;
+  }
+
+  .side-item:hover .fill,
+  .side-item.active .fill {
+    transform: scaleX(1);
   }
 
   .side-item:hover,
   .side-item.active {
-    color: var(--accent-ink);
-    background-position: left;
-    border-color: var(--accent);
+    color: var(--chrome-ink);
+    border-color: var(--chrome);
   }
 
-  .side-item:hover::before,
-  .side-item.active::before {
-    color: var(--accent-ink);
+  .side-item:hover .mark,
+  .side-item.active .mark {
+    color: var(--chrome-ink);
   }
 
   .side-item.active {
@@ -278,14 +302,15 @@ import { projects } from '../content/resume';
   }
 
   /* Solid title bar — this is what makes the card read as a window rather than
-     a panel. Straight from the "code" tab on simon.lecoq.io. */
+     a panel. Straight from the "code" tab on simon.lecoq.io. Uses the muted
+     chrome colour, not the accent: nine saturated bars at once is a shout. */
   .card-head {
     display: flex;
     align-items: baseline;
     gap: var(--sp-2);
     padding: var(--sp-1) var(--sp-3) 5px;
-    color: var(--accent-ink);
-    background: var(--accent);
+    color: var(--chrome-ink);
+    background: var(--chrome);
   }
 
   .i {

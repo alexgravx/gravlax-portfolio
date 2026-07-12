@@ -90,7 +90,14 @@ export function initScramble() {
 
 /* -------------------------------------------------------------------- cursor */
 
+/**
+ * The custom block cursor is built and working, but switched off for now:
+ * the OS cursor stays. Flip this to `true` to bring it back.
+ */
+export const CUSTOM_CURSOR = false;
+
 export function initCursor() {
+  if (!CUSTOM_CURSOR) return;
   if (reduced || !matchMedia('(pointer: fine)').matches) return;
 
   const dot = document.createElement('div');
