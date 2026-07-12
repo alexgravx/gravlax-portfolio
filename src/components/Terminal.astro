@@ -56,7 +56,7 @@ const initialPrompt = `visitor@${profile.handle}:~$`;
 </section>
 
 <script>
-  import { createShell, run, prompt, completions, esc } from '../scripts/commands';
+  import { createShell, run, prompt, complete, esc } from '../scripts/commands';
   import { resolution } from '../scripts/neofetch';
 
   const term = document.querySelector<HTMLElement>('[data-term]');
@@ -154,18 +154,22 @@ const initialPrompt = `visitor@${profile.handle}:~$`;
 
       if (e.key === 'Tab') {
         e.preventDefault();
-        // Complete the last word, so `cd pro<Tab>` works as well as `pro<Tab>`.
-        const parts = input.value.split(/(\s+)/);
-        const lastIdx = parts.length - 1;
-        const stem = (parts[lastIdx] ?? '').toLowerCase();
-        if (!stem.trim()) return;
+        const { line, candidates } = complete(shell, input.value);
 
-        const hit = completions(shell).find((c) => c.toLowerCase().startsWith(stem));
-        if (hit) {
-          parts[lastIdx] = hit;
-          input.value = parts.join('');
-          requestAnimationFrame(drawCursor);
+        // Several matches: a shell echoes the line, lists the options, and
+        // leaves you with the shared prefix to keep typing.
+        if (candidates.length > 1) {
+          emit(
+            input.value,
+            `<div class="fs-list">${candidates
+              .map((c) => `<span class="${c.endsWith('/') ? 'fs-dir' : 'fs-file'}">${esc(c)}</span>`)
+              .join('')}</div>`,
+            prompt(shell),
+          );
         }
+
+        input.value = line;
+        requestAnimationFrame(drawCursor);
         return;
       }
 

@@ -191,14 +191,83 @@ function help(): string {
   );
 }
 
-/** Names offered to tab-completion, plus whatever is in the current directory. */
-export function completions(shell: Shell): string[] {
-  const node = lookup(shell.cwd);
-  const here =
-    node?.type === 'dir'
-      ? node.children.map((c) => (c.type === 'dir' ? `${c.name}/` : c.name))
-      : [];
-  return [...commands.map((c) => c.name), ...Object.keys(aliases), ...here];
+/* -------------------------------------------------------- completion */
+
+function commonPrefix(items: string[]): string {
+  if (!items.length) return '';
+  let prefix = items[0]!;
+  for (const item of items.slice(1)) {
+    let i = 0;
+    while (i < prefix.length && i < item.length && prefix[i] === item[i]) i++;
+    prefix = prefix.slice(0, i);
+  }
+  return prefix;
+}
+
+export interface Completion {
+  /** The line to put back in the input. */
+  line: string;
+  /** More than one match — the shell prints these and completes the shared prefix. */
+  candidates: string[];
+}
+
+/**
+ * Tab completion, the way a shell actually does it:
+ *   - the FIRST word completes against commands and aliases
+ *   - anything after it completes against the filesystem, never against command
+ *     names (which is why `cat e` used to yield the `experience` alias instead
+ *     of education.md / experience.md)
+ *   - one match completes it outright; several complete the longest shared
+ *     prefix and list the options
+ *   - an empty argument (`cat ` + Tab) lists the whole directory
+ */
+export function complete(shell: Shell, line: string): Completion {
+  const trailingSpace = /\s$/.test(line);
+  const parts = line.split(/\s+/).filter(Boolean);
+  const completingCommand = parts.length === 0 || (parts.length === 1 && !trailingSpace);
+
+  if (completingCommand) {
+    const stem = (parts[0] ?? '').toLowerCase();
+    const names = [...commands.map((c) => c.name), ...Object.keys(aliases)].sort();
+    const hits = names.filter((n) => n.startsWith(stem));
+
+    if (!hits.length) return { line, candidates: [] };
+    if (hits.length === 1) return { line: `${hits[0]!} `, candidates: [] };
+
+    const shared = commonPrefix(hits);
+    return { line: shared.length > stem.length ? shared : line, candidates: hits };
+  }
+
+  // Completing an argument: filesystem only.
+  const head = trailingSpace ? parts : parts.slice(0, -1);
+  const token = trailingSpace ? '' : parts[parts.length - 1]!;
+
+  // Split `projects/yz` into the directory to look in and the stem to match.
+  const slash = token.lastIndexOf('/');
+  const dirPart = slash >= 0 ? token.slice(0, slash + 1) : '';
+  const stem = slash >= 0 ? token.slice(slash + 1) : token;
+
+  const dirPath = resolve(shell.cwd, dirPart || '.');
+  const node = dirPath ? lookup(dirPath) : null;
+  if (!node || node.type !== 'dir') return { line, candidates: [] };
+
+  const hits = node.children
+    .filter((c) => c.name.toLowerCase().startsWith(stem.toLowerCase()))
+    .map((c) => (c.type === 'dir' ? `${c.name}/` : c.name))
+    .sort();
+
+  if (!hits.length) return { line, candidates: [] };
+
+  if (hits.length === 1) {
+    const only = hits[0]!;
+    // Directories keep the visitor typing; files are finished words.
+    const tail = only.endsWith('/') ? '' : ' ';
+    return { line: `${[...head, dirPart + only].join(' ')}${tail}`, candidates: [] };
+  }
+
+  const shared = commonPrefix(hits);
+  const filled = shared.length > stem.length ? shared : stem;
+  return { line: [...head, dirPart + filled].join(' '), candidates: hits };
 }
 
 export function run(shell: Shell, input: string): Result {

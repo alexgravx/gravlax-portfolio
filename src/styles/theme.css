@@ -335,7 +335,7 @@ html.has-custom-cursor input {
 }
 
 .term-out {
-  margin: var(--sp-2) 0 var(--sp-4);
+  margin: var(--sp-2) 0 var(--sp-3);
 }
 
 .term-block {
