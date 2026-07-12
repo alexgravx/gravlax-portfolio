@@ -66,7 +66,18 @@ const langColor: Record<string, string> = {
     {/* ---------- one panel per project ---------- */}
     {
       projects.map((p) => (
-        <div class="cards" data-panel={p.id} hidden>
+        // Column count comes from how many half-width cards this project has.
+        // `auto-fit` cannot help here: the full-width "about" card spans every
+        // track, so no track is ever empty for it to collapse.
+        <div
+          class="cards"
+          data-panel={p.id}
+          data-cols={Math.min(
+            [p.github, p.links, p.private, true].filter(Boolean).length,
+            3,
+          )}
+          hidden
+        >
           <article class="card wide">
             <div class="card-head">
               <svg class="i" viewBox="0 0 16 16" aria-hidden="true">
@@ -272,7 +283,9 @@ const langColor: Record<string, string> = {
     font-size: var(--step--1);
     text-align: left;
     color: var(--dim);
-    background: transparent;
+    /* Already a box at rest — a shade darker than the page, as on
+       simon.lecoq.io. The hover fill then wipes chrome over it. */
+    background: var(--rest);
     border: 0;
     /* The thin rules above and below, which appear on hover in the fill colour. */
     border-top: 1px solid transparent;
@@ -325,8 +338,23 @@ const langColor: Record<string, string> = {
 
   .cards {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
     gap: var(--sp-3);
+  }
+
+  /* Project panels: exactly as many columns as they have half-width cards, so
+     two cards (github + stack) span the full width instead of leaving a dead
+     column on the right. */
+  .cards[data-cols='1'] {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .cards[data-cols='2'] {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .cards[data-cols='3'] {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   .cards[hidden] {
@@ -460,6 +488,20 @@ const langColor: Record<string, string> = {
     from {
       opacity: 0;
       transform: translateY(6px);
+    }
+  }
+
+  /* These come after the [data-cols] rules, so they win on narrow screens
+     without needing !important. */
+  @media (max-width: 900px) {
+    .cards[data-cols='3'] {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 640px) {
+    .cards[data-cols] {
+      grid-template-columns: minmax(0, 1fr);
     }
   }
 

@@ -59,6 +59,10 @@
   --chrome: #6d6a56;
   --chrome-ink: #e6e2cd;
   --chrome-dim: #b3ae99;
+
+  /* Resting state of a selectable row: already a box, a shade darker than the
+     page, before the chrome fill wipes over it. */
+  --rest: #bdb8a1;
 }
 
 /* Dark — soft charcoal. Deliberately NOT pure black on pure white:
@@ -80,9 +84,12 @@
   --selection: rgba(98, 210, 148, 0.22);
   --shadow: rgba(0, 0, 0, 0.5);
 
-  --chrome: #32323c;
-  --chrome-ink: #cecbc4;
+  --chrome: #3d3d49;
+  --chrome-ink: #d5d2cb;
   --chrome-dim: #7b7986;
+
+  /* Sits between the page and the chrome fill, so rest → hover still reads. */
+  --rest: #23232b;
 }
 
 /* ---------------------------------------------------------------
