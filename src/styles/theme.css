@@ -342,6 +342,103 @@ html.has-custom-cursor input {
   animation: rise 0.18s ease-out;
 }
 
+/* ---------------------------------------------------------------
+   neofetch. GLOBAL because the `home` command rebuilds this block at
+   runtime, and Astro's scoped CSS would never match those nodes.
+   --------------------------------------------------------------- */
+
+.neofetch {
+  display: flex;
+  gap: var(--sp-5);
+  margin-bottom: var(--sp-3);
+  flex-wrap: wrap;
+}
+
+/* Monogram over the salmon, centred on each other. */
+.nf-art {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-3);
+  flex-shrink: 0;
+}
+
+.nf-mono,
+.nf-fish {
+  margin: 0;
+  color: var(--accent);
+  font-size: var(--step--1);
+  line-height: 1.15;
+  white-space: pre;
+}
+
+.nf-info {
+  margin: 0;
+  font-size: var(--step--1);
+  line-height: 1.5;
+  min-width: 0;
+}
+
+.nf-head {
+  font-weight: 700;
+}
+
+.nf-user,
+.nf-host {
+  color: var(--accent);
+}
+
+.nf-rule {
+  color: var(--faint);
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.nf-row {
+  display: flex;
+  gap: 1ch;
+}
+
+/* Wide enough for the longest key ("resolution"), so values share a column. */
+.nf-row dt {
+  color: var(--accent);
+  font-weight: 700;
+  min-width: 10ch;
+}
+
+.nf-row dd {
+  margin: 0;
+  color: var(--ink);
+}
+
+/* Medium: the art moves above the info, but the monogram and salmon sit
+   side by side rather than stacking — two tall blocks would push the info
+   right off the terminal. */
+@media (max-width: 860px) {
+  .neofetch {
+    flex-direction: column;
+    align-items: center;
+    gap: var(--sp-4);
+  }
+
+  .nf-art {
+    flex-direction: row;
+    align-items: center;
+    gap: var(--sp-5);
+  }
+
+  .nf-info {
+    align-self: stretch;
+  }
+}
+
+/* Phones: the salmon alone. */
+@media (max-width: 640px) {
+  .nf-mono {
+    display: none;
+  }
+}
+
 @keyframes rise {
   from {
     opacity: 0;

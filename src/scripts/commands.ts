@@ -1,4 +1,5 @@
 import { profile } from '../content/resume';
+import { renderNeofetch } from './neofetch';
 import { lookup, resolve, display, esc, type FsDir, type FsNode, type Path } from './fs';
 
 export { esc };
@@ -129,6 +130,13 @@ interface Command {
 
 const commands: Command[] = [
   { name: 'help', usage: 'help', summary: 'list available commands', run: () => ({ html: help() }) },
+  {
+    name: 'home',
+    usage: 'home',
+    summary: 'reprint the welcome banner',
+    run: () => ({ html: renderNeofetch() }),
+  },
+  { name: 'neofetch', usage: 'neofetch', summary: 'system info', run: () => ({ html: renderNeofetch() }) },
   { name: 'ls', usage: 'ls [path]', summary: 'list directory contents', run: ls },
   { name: 'cd', usage: 'cd [path]', summary: 'change directory', run: cd },
   { name: 'cat', usage: 'cat <file>', summary: 'print a file', run: cat },

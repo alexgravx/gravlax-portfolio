@@ -1,5 +1,6 @@
 ---
-import { profile, neofetch } from '../content/resume';
+import { profile } from '../content/resume';
+import { renderNeofetch } from '../scripts/neofetch';
 
 /**
  * The terminal window. It is the whole first screen.
@@ -8,65 +9,24 @@ import { profile, neofetch } from '../content/resume';
  * ls / cd / cat / tree / pwd all work, and the prompt reflects the cwd.
  * The cursor is a true inverse-video block that sits ON the character at the
  * caret — safe in `ch` units because the font is monospace.
+ *
+ * The neofetch block is rendered from scripts/neofetch.ts, the same module the
+ * `home` command uses to rebuild it — one source, two callers.
  */
-
-// Built line-by-line rather than as one template literal: a backtick cannot be
-// escaped inside String.raw without the backslash surviving into the output,
-// which is what turned the salmon into punctuation soup. Apostrophes it is.
-//
-// The monogram and the fish are two separate <pre> blocks stacked in a centred
-// column, so the AG sits over the middle of the salmon whatever their widths —
-// no hand-counted padding to drift out of alignment.
-const monogram = [
-  ' █████╗  ██████╗',
-  '██╔══██╗██╔════╝',
-  '███████║██║  ███╗',
-  '██╔══██║██║   ██║',
-  '██║  ██║╚██████╔╝',
-  '╚═╝  ╚═╝ ╚═════╝',
-].join('\n');
-
-const salmon = [
-  '      /"*._         _',
-  "  .-*'      '*-.._.-'/",
-  ' < * ))     ,       (',
-  '  \'*-._\'._(__.--*"\'.\\;',
-  "       ';/     ''--'",
-].join('\n');
-
 const initialPrompt = `visitor@${profile.handle}:~$`;
 ---
 
 <section class="term" data-term aria-label="Interactive terminal">
   <header class="term-bar">
     <span class="lights" aria-hidden="true"><i></i><i></i><i></i></span>
-    <span class="term-title">visitor@{profile.handle} — zsh — 96×28</span>
+    <span class="term-title">visitor@{profile.handle} — -zsh — tty1 — 96×28</span>
     <button type="button" class="term-clear" data-clear>clear</button>
   </header>
 
   <div class="term-body" data-body>
     <div class="term-log" data-log aria-live="polite">
       <div class="term-block">
-        <div class="neofetch">
-          <div class="nf-art" aria-hidden="true">
-            <pre class="nf-mono">{monogram}</pre>
-            <pre class="nf-fish">{salmon}</pre>
-          </div>
-          <dl class="nf-info">
-            <div class="nf-head">
-              <span class="nf-user">visitor</span>@<span class="nf-host">{profile.handle}</span>
-            </div>
-            <div class="nf-rule" aria-hidden="true">───────────────────────────────</div>
-            {
-              neofetch.map(([k, v]) => (
-                <div class="nf-row">
-                  <dt>{k}</dt>
-                  <dd data-res={k === 'resolution' ? '' : undefined}>{v}</dd>
-                </div>
-              ))
-            }
-          </dl>
-        </div>
+        <Fragment set:html={renderNeofetch()} />
 
         <p class="term-hint comment">
           Type <span class="cmd-name">help</span>, or poke around with{' '}
@@ -97,6 +57,7 @@ const initialPrompt = `visitor@${profile.handle}:~$`;
 
 <script>
   import { createShell, run, prompt, completions, esc } from '../scripts/commands';
+  import { resolution } from '../scripts/neofetch';
 
   const term = document.querySelector<HTMLElement>('[data-term]');
 
@@ -113,13 +74,13 @@ const initialPrompt = `visitor@${profile.handle}:~$`;
     const history: string[] = [];
     let histIdx = 0;
 
-    // Real neofetch reports the display, so ours does too: the visitor's own
-    // screen, with the DPR suffix macOS-style (1512x982@2x).
-    const res = term.querySelector<HTMLElement>('[data-res]');
-    if (res) {
-      const dpr = Math.round(devicePixelRatio * 100) / 100;
-      res.textContent = `${screen.width}x${screen.height}${dpr !== 1 ? `@${dpr}x` : ''}`;
-    }
+    // The server-rendered block ships a placeholder for `resolution` (it cannot
+    // know the visitor's screen). Fill it in now.
+    term.querySelectorAll<HTMLElement>('.nf-row').forEach((row) => {
+      if (row.querySelector('dt')?.textContent !== 'resolution') return;
+      const dd = row.querySelector('dd');
+      if (dd) dd.textContent = resolution();
+    });
 
     /** Inverse-video block, sitting on the character at the caret. */
     function drawCursor() {
@@ -298,73 +259,6 @@ const initialPrompt = `visitor@${profile.handle}:~$`;
     line-height: 1.45;
   }
 
-  /* ---------- neofetch ---------- */
-
-  .neofetch {
-    display: flex;
-    gap: var(--sp-5);
-    margin-bottom: var(--sp-3);
-    flex-wrap: wrap;
-  }
-
-  /* Centred column: the monogram sits over the middle of the salmon. */
-  .nf-art {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: var(--sp-3);
-    flex-shrink: 0;
-  }
-
-  .nf-mono,
-  .nf-fish {
-    margin: 0;
-    color: var(--accent);
-    font-size: var(--step--1);
-    line-height: 1.15;
-    white-space: pre;
-  }
-
-  .nf-info {
-    margin: 0;
-    font-size: var(--step--1);
-    line-height: 1.5;
-    min-width: 0;
-  }
-
-  .nf-head {
-    font-weight: 700;
-  }
-
-  .nf-user,
-  .nf-host {
-    color: var(--accent);
-  }
-
-  .nf-rule {
-    color: var(--faint);
-    overflow: hidden;
-    white-space: nowrap;
-  }
-
-  .nf-row {
-    display: flex;
-    gap: 1ch;
-  }
-
-  /* Wide enough for the longest key ("resolution", 10 chars), so every value
-     starts in the same column. */
-  .nf-row dt {
-    color: var(--accent);
-    font-weight: 700;
-    min-width: 10ch;
-  }
-
-  .nf-row dd {
-    margin: 0;
-    color: var(--ink);
-  }
-
   .term-hint {
     margin: 0;
   }
@@ -417,27 +311,16 @@ const initialPrompt = `visitor@${profile.handle}:~$`;
     animation: none;
   }
 
-  /* Medium screens: keep both the monogram and the salmon, but stack the art
-     above the info rather than beside it. */
-  @media (max-width: 860px) {
-    .neofetch {
-      flex-direction: column;
-      align-items: center;
-      gap: var(--sp-4);
-    }
-
-    .nf-info {
-      align-self: stretch;
-    }
-  }
-
-  /* Phones: the salmon alone. The monogram is 17 columns of heavy block glyphs
-     and, stacked on top of the fish, eats most of the screen. */
+  /* Phones: drop the window title, but keep `clear` — and push it to the right,
+     since the title was the flex spacer holding it there. */
   @media (max-width: 640px) {
     .term-title,
-    .term-hint-scroll,
-    .nf-mono {
+    .term-hint-scroll {
       display: none;
+    }
+
+    .term-clear {
+      margin-left: auto;
     }
   }
 </style>

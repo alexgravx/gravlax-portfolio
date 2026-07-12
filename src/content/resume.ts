@@ -447,7 +447,7 @@ export const neofetch: Array<[string, string]> = [
   ['name', profile.name],
   ['role', profile.title],
   ['location', profile.location],
-  ['edu', 'MEng Computer Science, Cornell Tech'],
+  ['edu', 'MEng CS @ Cornell'],
   ['shell', 'zsh 5.9'],
   // Filled in at runtime from the visitor's actual screen — the placeholder is
   // what non-JS visitors see.

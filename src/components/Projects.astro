@@ -292,15 +292,11 @@ const langColor: Record<string, string> = {
     border-bottom: 2px solid transparent;
     padding: var(--sp-1) var(--sp-2);
     cursor: pointer;
-    /* Leaving: the rules fade out gently. */
-    transition: color 0.32s ease-out, border-color 0.28s ease-out;
-  }
-
-  /* Arriving: the rules snap on with NO transition, so a fast sweep up and down
-     the list still lights up every row it touches. Only the fill eases — waiting
-     on a 0.28s colour fade meant quick passes never showed the rules at all. */
-  .side-item:hover {
-    transition: color 0.32s ease-out, border-color 0s;
+    /* The rules are NOT transitioned in either direction: they appear the moment
+       the cursor arrives and vanish the moment it leaves, so a fast sweep reads
+       as a single highlight travelling down the list rather than several rows
+       lit at once. Only the fill and the text colour ease. */
+    transition: color 0.32s ease-out;
   }
 
   .fill {
