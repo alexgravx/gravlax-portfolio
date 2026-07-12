@@ -1,5 +1,5 @@
 ---
-import { profile } from '../content/resume';
+import { profile, neofetch } from '../content/resume';
 
 /**
  * The terminal window. It is the whole first screen.
@@ -13,29 +13,26 @@ import { profile } from '../content/resume';
 // Built line-by-line rather than as one template literal: a backtick cannot be
 // escaped inside String.raw without the backslash surviving into the output,
 // which is what turned the salmon into punctuation soup. Apostrophes it is.
-const logo = [
+//
+// The monogram and the fish are two separate <pre> blocks stacked in a centred
+// column, so the AG sits over the middle of the salmon whatever their widths —
+// no hand-counted padding to drift out of alignment.
+const monogram = [
   ' █████╗  ██████╗',
   '██╔══██╗██╔════╝',
   '███████║██║  ███╗',
   '██╔══██║██║   ██║',
   '██║  ██║╚██████╔╝',
   '╚═╝  ╚═╝ ╚═════╝',
-  '',
-  "      /\"*._         _",
+].join('\n');
+
+const salmon = [
+  '      /"*._         _',
   "  .-*'      '*-.._.-'/",
   ' < * ))     ,       (',
   '  \'*-._\'._(__.--*"\'.\\;',
   "       ';/     ''--'",
 ].join('\n');
-
-const info: Array<[string, string]> = [
-  ['name', profile.name],
-  ['role', profile.title],
-  ['location', profile.location],
-  ['edu', 'MEng Computer Science, Cornell Tech'],
-  ['shell', 'zsh'],
-  ['theme', 'gravlax'],
-];
 
 const initialPrompt = `visitor@${profile.handle}:~$`;
 ---
@@ -51,14 +48,17 @@ const initialPrompt = `visitor@${profile.handle}:~$`;
     <div class="term-log" data-log aria-live="polite">
       <div class="term-block">
         <div class="neofetch">
-          <pre class="nf-logo" aria-hidden="true">{logo}</pre>
+          <div class="nf-art" aria-hidden="true">
+            <pre class="nf-mono">{monogram}</pre>
+            <pre class="nf-fish">{salmon}</pre>
+          </div>
           <dl class="nf-info">
             <div class="nf-head">
               <span class="nf-user">visitor</span>@<span class="nf-host">{profile.handle}</span>
             </div>
             <div class="nf-rule" aria-hidden="true">───────────────────────────────</div>
             {
-              info.map(([k, v]) => (
+              neofetch.map(([k, v]) => (
                 <div class="nf-row">
                   <dt>{k}</dt>
                   <dd>{v}</dd>
@@ -299,13 +299,22 @@ const initialPrompt = `visitor@${profile.handle}:~$`;
     flex-wrap: wrap;
   }
 
-  .nf-logo {
+  /* Centred column: the monogram sits over the middle of the salmon. */
+  .nf-art {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--sp-3);
+    flex-shrink: 0;
+  }
+
+  .nf-mono,
+  .nf-fish {
     margin: 0;
     color: var(--accent);
     font-size: var(--step--1);
     line-height: 1.15;
     white-space: pre;
-    flex-shrink: 0;
   }
 
   .nf-info {
@@ -400,7 +409,7 @@ const initialPrompt = `visitor@${profile.handle}:~$`;
 
   @media (max-width: 640px) {
     .term-title,
-    .nf-logo,
+    .nf-art,
     .term-hint-scroll {
       display: none;
     }

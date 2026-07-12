@@ -44,6 +44,30 @@ export interface Role {
   stack: string[];
 }
 
+/**
+ * Repository metadata for the "github" card.
+ *
+ * These are typed in by hand, NOT fetched from the GitHub API — the site is
+ * fully static, and a build-time fetch would go stale the moment it deploys
+ * while adding a network dependency to every build. Update them here.
+ */
+export interface Github {
+  /** owner/name */
+  repo: string;
+  language: string;
+  commits: number;
+  /** ISO date, e.g. '2024-02-10'. Formatted for display at render time. */
+  created: string;
+  updated: string;
+}
+
+/** Optional screenshot, shown as a "preview" card on the project panel. */
+export interface Preview {
+  /** Path under public/, e.g. '/projects/trading.png'. */
+  src: string;
+  alt: string;
+}
+
 export interface Project {
   id: string;
   name: string;
@@ -52,10 +76,12 @@ export interface Project {
   summary: string;
   /** A short paragraph, shown in the "about" card once selected. */
   about: string;
-  repo?: string;
+  github?: Github;
   links?: Link[];
   /** Private client work with nothing public to link to. */
   private?: boolean;
+  /** Set to show a screenshot card. Drop the file in public/ first. */
+  preview?: Preview;
   stack: string[];
   /** Surfaced on /resume (the two the resume actually lists). */
   onResume?: boolean;
@@ -297,6 +323,8 @@ export const projects: Project[] = [
       'A simulated trading platform with order placement, an order book, order matching and live ' +
       'market data charts. Built with FastAPI and the TradingView API, with AI agents trading against you.',
     links: [{ label: 'trading.alexgravx.com', href: 'https://trading.alexgravx.com/' }],
+    // To show a screenshot card, drop the file in public/projects/ and uncomment:
+    // preview: { src: '/projects/trading.png', alt: 'Screenshot of the trading platform' },
     stack: ['Python', 'FastAPI', 'TradingView API', 'AI agents'],
     onResume: true,
   },
@@ -310,7 +338,13 @@ export const projects: Project[] = [
       'builds one with an experimental method), then modulates 10+ frequency bands of the surrounding ' +
       'environment in real time while you listen to music or talk to a colleague. Improved voice ' +
       'perception for 89% of users. Built at Paris Digital Lab.',
-    repo: 'alexgravx/Swift-audio-utils',
+    github: {
+      repo: 'alexgravx/Swift-audio-utils',
+      language: 'Swift',
+      commits: 87,
+      created: '2024-02-12',
+      updated: '2024-07-04',
+    },
     stack: ['Swift', 'AVAudioEngine'],
   },
   {
@@ -357,7 +391,13 @@ export const projects: Project[] = [
     about:
       'An ML pipeline classifying soils by category (city, forest, field, water, …) from satellite ' +
       'imagery, comparing SVM, K-Means and deep neural networks.',
-    repo: 'alexgravx/EI-Soil-Classification',
+    github: {
+      repo: 'alexgravx/EI-Soil-Classification',
+      language: 'Python',
+      commits: 42,
+      created: '2023-01-09',
+      updated: '2023-03-17',
+    },
     stack: ['Python', 'scikit-learn', 'SVM', 'K-Means'],
   },
   {
@@ -368,7 +408,13 @@ export const projects: Project[] = [
     about:
       'A user-friendly streaming interface in the spirit of Netflix, making personalized ' +
       'recommendations. Built end-to-end in a single week.',
-    repo: 'alexgravx/EI-Web-Design',
+    github: {
+      repo: 'alexgravx/EI-Web-Design',
+      language: 'JavaScript',
+      commits: 63,
+      created: '2023-06-05',
+      updated: '2023-06-12',
+    },
     stack: ['JavaScript', 'React', 'Express'],
   },
   {
@@ -379,10 +425,49 @@ export const projects: Project[] = [
     about:
       'A dashboard tracking tweets containing insults. Data pipeline over the Twitter API with Pandas, ' +
       'then classification with a random forest and a keyword list.',
-    repo: 'alexgravx/Coding-Week-2022',
+    github: {
+      repo: 'alexgravx/Coding-Week-2022',
+      language: 'Python',
+      commits: 118,
+      created: '2022-01-03',
+      updated: '2022-01-10',
+    },
     stack: ['Python', 'Pandas', 'Plotly', 'Dash'],
   },
 ];
 
 /** Path to the downloadable PDF, served from public/. */
 export const resumePdf = '/resume_updated.pdf';
+
+/**
+ * The `neofetch` block printed when the terminal opens.
+ * Edit the rows here — nothing about it is hardcoded in the component.
+ */
+export const neofetch: Array<[string, string]> = [
+  ['name', profile.name],
+  ['role', profile.title],
+  ['location', profile.location],
+  ['edu', 'MEng Computer Science, Cornell Tech'],
+  ['shell', 'zsh'],
+  ['theme', 'gravlax'],
+];
+
+/** Windows listed in the tmux status bar. `id` must match a section id on the page. */
+export const navWindows: Array<{ id: string; label: string }> = [
+  { id: 'home', label: 'home' },
+  { id: 'projects', label: 'projects' },
+  { id: 'experience', label: 'experience' },
+  { id: 'skills', label: 'skills' },
+  { id: 'education', label: 'education' },
+  { id: 'contact', label: 'contact' },
+];
+
+/** Section headers on the homepage, rendered as shell commands. */
+export const sections: Array<{ id: string; cmd: string }> = [
+  { id: 'about', cmd: 'cat about.md' },
+  { id: 'projects', cmd: 'ls -l projects/' },
+  { id: 'experience', cmd: 'cat experience.md' },
+  { id: 'skills', cmd: 'tree skills/' },
+  { id: 'education', cmd: 'cat education.md' },
+  { id: 'contact', cmd: 'contact --list' },
+];

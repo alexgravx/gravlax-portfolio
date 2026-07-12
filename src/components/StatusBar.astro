@@ -1,19 +1,17 @@
 ---
 import ThemeToggle from './ThemeToggle.astro';
-import { profile } from '../content/resume';
+import { icons } from './icons';
+import { profile, navWindows } from '../content/resume';
 
 /**
  * Navigation as a tmux status line, pinned to the bottom of the viewport.
  * Windows are numbered like tmux; the active one is highlighted by scroll-spy.
  */
-const windows = [
-  { id: 'home', label: 'home' },
-  { id: 'projects', label: 'projects' },
-  { id: 'experience', label: 'experience' },
-  { id: 'skills', label: 'skills' },
-  { id: 'education', label: 'education' },
-  { id: 'contact', label: 'contact' },
-];
+
+// Social links come straight from the profile, matched to an icon by label.
+const social = profile.links
+  .filter((l) => l.label === 'github' || l.label === 'linkedin')
+  .map((l) => ({ ...l, path: icons[l.label]! }));
 ---
 
 <nav class="status" aria-label="Sections">
@@ -21,7 +19,7 @@ const windows = [
 
   <ul class="windows">
     {
-      windows.map((w, i) => (
+      navWindows.map((w, i) => (
         <li>
           <a href={`#${w.id}`} class="win" data-win={w.id}>
             <span class="idx">{i}</span>:<span class="label">{w.label}</span>
@@ -32,7 +30,26 @@ const windows = [
   </ul>
 
   <span class="right">
-    <a class="win extra" href="/resume">resume</a>
+    <a class="ico" href="/resume" aria-label="Resume" title="Resume">
+      <svg viewBox="0 0 16 16" aria-hidden="true"><path d={icons.file} /></svg>
+    </a>
+    {
+      social.map((s) => (
+        <a
+          class="ico"
+          href={s.href}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={s.label}
+          title={s.label}
+        >
+          <svg viewBox="0 0 16 16" aria-hidden="true">
+            <path d={s.path} />
+          </svg>
+        </a>
+      ))
+    }
+    <span class="sep" aria-hidden="true"></span>
     <ThemeToggle />
   </span>
 </nav>
@@ -56,7 +73,7 @@ const windows = [
       if (visible) setActive(visible.target.id);
     },
     // Bias toward the upper half of the viewport so the "current" section is
-    // the one being read, not the one just scrolling into the bottom edge.
+    // the one being read, not the one just entering at the bottom edge.
     { rootMargin: '-10% 0px -55% 0px', threshold: [0.05, 0.25, 0.5] },
   );
 
@@ -133,14 +150,43 @@ const windows = [
   .right {
     display: flex;
     align-items: center;
-    gap: var(--sp-2);
+    gap: var(--sp-1);
     margin-left: auto;
     flex-shrink: 0;
   }
 
+  .ico {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 20px;
+    border: 0;
+    color: var(--dim);
+    transition: color 0.15s ease, background 0.15s ease;
+  }
+
+  .ico svg {
+    width: 13px;
+    height: 13px;
+    fill: currentColor;
+  }
+
+  .ico:hover {
+    color: var(--accent);
+    background: var(--surface);
+    border: 0;
+  }
+
+  .sep {
+    width: 1px;
+    height: 12px;
+    background: var(--border);
+    margin: 0 var(--sp-1);
+  }
+
   @media (max-width: 720px) {
-    .session,
-    .extra {
+    .session {
       display: none;
     }
   }

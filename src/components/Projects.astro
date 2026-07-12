@@ -1,4 +1,5 @@
 ---
+import { icons } from './icons';
 import { projects } from '../content/resume';
 
 /**
@@ -7,6 +8,19 @@ import { projects } from '../content/resume';
  * an "overview" entry whose cards are the projects themselves, and a
  * staggered fade-in on every switch.
  */
+
+const fmt = (iso: string) =>
+  new Date(iso).toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+
+/** GitHub's language dot colours, so the badge reads the way it does on the repo page. */
+const langColor: Record<string, string> = {
+  Python: '#3572A5',
+  JavaScript: '#F1E05A',
+  TypeScript: '#3178C6',
+  Swift: '#F05138',
+  Go: '#00ADD8',
+  Java: '#B07219',
+};
 ---
 
 <div class="browser" data-projects>
@@ -38,7 +52,7 @@ import { projects } from '../content/resume';
           <button type="button" class="card as-link" data-select={p.id}>
             <span class="card-head">
               <svg class="i" viewBox="0 0 16 16" aria-hidden="true">
-                <path d="M0 2.75C0 1.784.784 1 1.75 1h12.5c.966 0 1.75.784 1.75 1.75v10.5A1.75 1.75 0 0 1 14.25 15H1.75A1.75 1.75 0 0 1 0 13.25Zm1.75-.25a.25.25 0 0 0-.25.25v10.5c0 .138.112.25.25.25h12.5a.25.25 0 0 0 .25-.25V2.75a.25.25 0 0 0-.25-.25ZM7.25 8a.75.75 0 0 1-.22.53l-2.25 2.25a.75.75 0 0 1-1.06-1.06L5.44 8 3.72 6.28a.75.75 0 1 1 1.06-1.06l2.25 2.25c.141.14.22.331.22.53Zm1.5 1.5a.75.75 0 0 0 0 1.5h3a.75.75 0 0 0 0-1.5Z" />
+                <path d={icons.terminal} />
               </svg>
               <span class="card-name">{p.name}</span>
               <span class="card-year">{p.year}</span>
@@ -56,7 +70,7 @@ import { projects } from '../content/resume';
           <article class="card wide">
             <div class="card-head">
               <svg class="i" viewBox="0 0 16 16" aria-hidden="true">
-                <path d="M8 1.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm6.5-.25A.75.75 0 0 1 7.25 7h1a.75.75 0 0 1 .75.75v2.75h.25a.75.75 0 0 1 0 1.5h-2a.75.75 0 0 1 0-1.5h.25v-2h-.25a.75.75 0 0 1-.75-.75ZM8 6a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z" />
+                <path d={icons.about} />
               </svg>
               <span class="card-name">about</span>
               <span class="card-year">{p.year}</span>
@@ -64,18 +78,63 @@ import { projects } from '../content/resume';
             <div class="card-body">{p.about}</div>
           </article>
 
-          {p.repo && (
+          {/* Optional screenshot. Set `preview` in the data file to switch it on. */}
+          {p.preview && (
+            <article class="card wide">
+              <div class="card-head">
+                <svg class="i" viewBox="0 0 16 16" aria-hidden="true">
+                  <path d={icons.image} />
+                </svg>
+                <span class="card-name">preview</span>
+              </div>
+              <div class="card-body flush">
+                <img class="shot" src={p.preview.src} alt={p.preview.alt} loading="lazy" />
+              </div>
+            </article>
+          )}
+
+          {p.github && (
             <article class="card">
               <div class="card-head">
                 <svg class="i" viewBox="0 0 16 16" aria-hidden="true">
-                  <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8Z" />
+                  <path d={icons.github} />
                 </svg>
                 <span class="card-name">github</span>
               </div>
               <div class="card-body">
-                <a href={`https://github.com/${p.repo}`} target="_blank" rel="noopener noreferrer">
-                  {p.repo}
+                <a
+                  class="repo"
+                  href={`https://github.com/${p.github.repo}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {p.github.repo}
                 </a>
+                <dl class="meta">
+                  <div>
+                    <dt>language</dt>
+                    <dd>
+                      <span
+                        class="dot"
+                        style={`background:${langColor[p.github.language] ?? 'var(--dim)'}`}
+                        aria-hidden="true"
+                      />
+                      {p.github.language}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>commits</dt>
+                    <dd>{p.github.commits}</dd>
+                  </div>
+                  <div>
+                    <dt>created</dt>
+                    <dd>{fmt(p.github.created)}</dd>
+                  </div>
+                  <div>
+                    <dt>updated</dt>
+                    <dd>{fmt(p.github.updated)}</dd>
+                  </div>
+                </dl>
               </div>
             </article>
           )}
@@ -84,7 +143,7 @@ import { projects } from '../content/resume';
             <article class="card">
               <div class="card-head">
                 <svg class="i" viewBox="0 0 16 16" aria-hidden="true">
-                  <path d="M7.775 3.275a.75.75 0 0 0 1.06 1.06l1.25-1.25a2 2 0 1 1 2.83 2.83l-2.5 2.5a2 2 0 0 1-2.83 0 .75.75 0 0 0-1.06 1.06 3.5 3.5 0 0 0 4.95 0l2.5-2.5a3.5 3.5 0 0 0-4.95-4.95Zm-4.69 9.64a2 2 0 0 1 0-2.83l2.5-2.5a2 2 0 0 1 2.83 0 .75.75 0 0 0 1.06-1.06 3.5 3.5 0 0 0-4.95 0l-2.5 2.5a3.5 3.5 0 0 0 4.95 4.95l1.25-1.25a.75.75 0 0 0-1.06-1.06l-1.25 1.25a2 2 0 0 1-2.83 0Z" />
+                  <path d={icons.link} />
                 </svg>
                 <span class="card-name">links</span>
               </div>
@@ -104,7 +163,7 @@ import { projects } from '../content/resume';
             <article class="card">
               <div class="card-head">
                 <svg class="i" viewBox="0 0 16 16" aria-hidden="true">
-                  <path d="M4 4a4 4 0 0 1 8 0v2h.25c.966 0 1.75.784 1.75 1.75v5.5A1.75 1.75 0 0 1 12.25 15h-8.5A1.75 1.75 0 0 1 2 13.25v-5.5C2 6.784 2.784 6 3.75 6H4Zm6.5 2V4a2.5 2.5 0 1 0-5 0v2Zm-6.75 1.5a.25.25 0 0 0-.25.25v5.5c0 .138.112.25.25.25h8.5a.25.25 0 0 0 .25-.25v-5.5a.25.25 0 0 0-.25-.25Z" />
+                  <path d={icons.lock} />
                 </svg>
                 <span class="card-name">source</span>
               </div>
@@ -115,7 +174,7 @@ import { projects } from '../content/resume';
           <article class="card">
             <div class="card-head">
               <svg class="i" viewBox="0 0 16 16" aria-hidden="true">
-                <path d="M2 2.75C2 1.784 2.784 1 3.75 1h8.5c.966 0 1.75.784 1.75 1.75v10.5A1.75 1.75 0 0 1 12.25 15h-8.5A1.75 1.75 0 0 1 2 13.25Zm1.75-.25a.25.25 0 0 0-.25.25v10.5c0 .138.112.25.25.25h8.5a.25.25 0 0 0 .25-.25V2.75a.25.25 0 0 0-.25-.25ZM5 4.75A.75.75 0 0 1 5.75 4h4.5a.75.75 0 0 1 0 1.5h-4.5A.75.75 0 0 1 5 4.75Zm0 3A.75.75 0 0 1 5.75 7h4.5a.75.75 0 0 1 0 1.5h-4.5A.75.75 0 0 1 5 7.75Zm0 3a.75.75 0 0 1 .75-.75h2.5a.75.75 0 0 1 0 1.5h-2.5a.75.75 0 0 1-.75-.75Z" />
+                <path d={icons.stack} />
               </svg>
               <span class="card-name">stack</span>
             </div>
@@ -163,7 +222,6 @@ import { projects } from '../content/resume';
       });
     }
 
-    // Sidebar entries and overview cards both select.
     root.querySelectorAll<HTMLElement>('[data-select]').forEach((el) => {
       el.addEventListener('click', () => show(el.dataset.select!));
     });
@@ -188,7 +246,7 @@ import { projects } from '../content/resume';
     border-left: 2px solid var(--border);
     padding-left: var(--sp-3);
     position: sticky;
-    top: 72px;
+    top: var(--sp-4);
   }
 
   .side-label {
@@ -201,10 +259,9 @@ import { projects } from '../content/resume';
 
   /* Sweep-fill hover, after the aside on simon.lecoq.io.
      He animates `background-position` on an over-wide gradient, which repaints
-     the element every frame and visibly stutters when the pointer moves fast.
-     A transform on a pseudo-layer is composited on the GPU instead, so it stays
-     fluid however quickly you sweep across the list — and it reverses cleanly
-     mid-flight rather than snapping. */
+     every frame and stutters under a fast pointer. A transform on a pseudo-layer
+     is composited on the GPU instead, so it stays fluid however quickly you
+     sweep the list, and reverses cleanly mid-flight rather than snapping. */
   .side-item {
     position: relative;
     isolation: isolate;
@@ -217,21 +274,23 @@ import { projects } from '../content/resume';
     color: var(--dim);
     background: transparent;
     border: 0;
+    /* The thin rules above and below, which appear on hover in the fill colour. */
     border-top: 1px solid transparent;
     border-bottom: 1px solid transparent;
     padding: var(--sp-1) var(--sp-2);
     cursor: pointer;
-    overflow: hidden;
     transition: color 0.32s ease-out, border-color 0.32s ease-out;
   }
 
   .fill {
     position: absolute;
-    inset: 0;
+    /* Inset vertically so the fill never touches the rules — that gap is what
+       makes them read as separate hairlines rather than a thick block. */
+    inset: 2px 0;
     z-index: -1;
     background: var(--chrome);
     transform: scaleX(0);
-    transform-origin: right center;
+    transform-origin: left center; /* wipes in from the left */
     transition: transform 0.42s cubic-bezier(0.22, 1, 0.36, 1);
     will-change: transform;
   }
@@ -278,6 +337,9 @@ import { projects } from '../content/resume';
     display: flex;
     flex-direction: column;
     text-align: left;
+    /* A <button> carries UA padding, which was leaving a gap of surface colour
+       around the title bar on the overview cards. */
+    padding: 0;
     background: var(--surface);
     border: 1px solid var(--border);
     overflow: hidden;
@@ -302,12 +364,12 @@ import { projects } from '../content/resume';
   }
 
   /* Solid title bar — this is what makes the card read as a window rather than
-     a panel. Straight from the "code" tab on simon.lecoq.io. Uses the muted
-     chrome colour, not the accent: nine saturated bars at once is a shout. */
+     a panel. Uses the muted chrome, not the accent: nine saturated bars is a shout. */
   .card-head {
     display: flex;
     align-items: baseline;
     gap: var(--sp-2);
+    width: 100%;
     padding: var(--sp-1) var(--sp-3) 5px;
     color: var(--chrome-ink);
     background: var(--chrome);
@@ -324,7 +386,6 @@ import { projects } from '../content/resume';
   .card-name {
     font-weight: 700;
     font-size: var(--step--1);
-    /* Project titles are long; wrap them rather than truncating. */
     line-height: 1.35;
   }
 
@@ -341,12 +402,58 @@ import { projects } from '../content/resume';
     flex-grow: 1;
   }
 
+  .card-body.flush {
+    padding: 0;
+  }
+
   .card.as-link .card-body {
     color: var(--dim);
   }
 
-  .card .tags {
+  .shot {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  /* ---------- github card ---------- */
+
+  .repo {
+    display: inline-block;
+    margin-bottom: var(--sp-3);
+    word-break: break-all;
+  }
+
+  .meta {
     margin: 0;
+    display: grid;
+    gap: 2px;
+    font-size: var(--step--1);
+  }
+
+  .meta > div {
+    display: flex;
+    gap: 1ch;
+  }
+
+  .meta dt {
+    min-width: 10ch;
+    color: var(--faint);
+  }
+
+  .meta dd {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.6ch;
+    color: var(--ink);
+  }
+
+  .dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    flex-shrink: 0;
   }
 
   @keyframes card-in {
@@ -361,8 +468,8 @@ import { projects } from '../content/resume';
       grid-template-columns: 1fr;
     }
 
-    /* On narrow screens the sidebar becomes a horizontally scrollable strip,
-       rather than nine stacked lines pushing the cards off-screen. */
+    /* The sidebar becomes a horizontally scrollable strip, rather than nine
+       stacked lines pushing the cards off-screen. */
     .side {
       position: static;
       flex-direction: row;
@@ -387,10 +494,6 @@ import { projects } from '../content/resume';
     .side-item {
       white-space: nowrap;
       border: 1px solid var(--border);
-    }
-
-    .side-item:hover {
-      transform: none;
     }
   }
 </style>

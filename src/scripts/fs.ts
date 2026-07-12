@@ -47,7 +47,7 @@ const dir = (name: string, children: FsNode[]): FsDir => ({ type: 'dir', name, c
 function projectFile(p: (typeof projects)[number]): FsFile {
   return file(`${p.id}.md`, () => {
     const links = [
-      ...(p.repo ? [link(`https://github.com/${p.repo}`, p.repo)] : []),
+      ...(p.github ? [link(`https://github.com/${p.github.repo}`, p.github.repo)] : []),
       ...(p.links ?? []).map((l) => link(l.href, l.label)),
       ...(p.private ? ['<span class="comment">private client work — no public source</span>'] : []),
     ];
