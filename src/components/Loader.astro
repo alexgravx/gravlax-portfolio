@@ -12,7 +12,7 @@
 ---
 
 <div id="boot" data-boot hidden>
-  <div class="boot-inner" data-boot-inner>
+  <div class="boot-inner">
     <pre class="boot-log" data-boot-log aria-hidden="true"></pre>
     <div class="boot-bar">
       <div class="boot-bar-fill" data-boot-bar></div>
@@ -89,56 +89,11 @@
           .join('\n');
       }
 
-      /**
-       * How the boot screen gets out of the way.
-       *   'glyphs' — the screen breaks into terminal characters that wink out
-       *              one by one, revealing the page beneath (Lecoq does the same
-       *              thing with triangles).
-       *   'fade'   — a plain cross-fade.
-       * Swap the constant to change it; delete the `glyphs` branch to remove it.
-       */
-      const REVEAL: 'glyphs' | 'fade' = 'glyphs';
-
-      const CHARS = '$@#%&*<>/|_-=+~^?!;:01'.split('');
-      const CELL = 22; // px
-
-      function dissolve() {
-        const inner = boot!.querySelector<HTMLElement>('[data-boot-inner]')!;
-        inner.style.opacity = '0';
-
-        const cols = Math.ceil(innerWidth / CELL);
-        const rows = Math.ceil(innerHeight / CELL);
-
-        const grid = document.createElement('div');
-        grid.className = 'glyphs';
-        grid.style.gridTemplateColumns = `repeat(${cols}, ${CELL}px)`;
-        grid.style.gridAutoRows = `${CELL}px`;
-
-        const frag = document.createDocumentFragment();
-        for (let i = 0; i < cols * rows; i++) {
-          const cell = document.createElement('span');
-          cell.textContent = CHARS[Math.floor(Math.random() * CHARS.length)]!;
-          cell.style.animationDelay = `${Math.random() * 420}ms`;
-          frag.append(cell);
-        }
-        grid.append(frag);
-
-        // The cells now provide the cover, so the panel behind them can go clear.
-        boot!.style.background = 'transparent';
-        boot!.append(grid);
-      }
-
       async function finish() {
         if (!boot || boot.dataset.done) return;
         boot.dataset.done = '1';
         sessionStorage.setItem('booted', '1');
         document.documentElement.classList.remove('booting');
-
-        if (REVEAL === 'glyphs' && !reduced) {
-          dissolve();
-          setTimeout(() => boot.remove(), 780);
-          return;
-        }
 
         boot.classList.add('out');
         boot.addEventListener('transitionend', () => boot.remove(), { once: true });
@@ -179,41 +134,6 @@
     overflow: hidden;
   }
 
-  /* The glyph dissolve.
-     GLOBAL on purpose: the grid is built at runtime, so it never gets Astro's
-     scoping attribute and scoped rules would silently skip it — leaving an
-     unstyled pile of characters on the page. */
-  .glyphs {
-    position: absolute;
-    inset: 0;
-    display: grid;
-    overflow: hidden;
-    pointer-events: none;
-  }
-
-  /* Each cell paints the page background, so together they form the cover;
-     as they wink out, the site shows through. */
-  .glyphs span {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: var(--bg);
-    color: var(--faint);
-    font-size: 12px;
-    line-height: 1;
-    animation: glyph-out 0.24s ease-in forwards;
-  }
-
-  @keyframes glyph-out {
-    40% {
-      color: var(--accent);
-      opacity: 1;
-    }
-    to {
-      opacity: 0;
-      transform: scale(0.55);
-    }
-  }
 </style>
 
 <style>
@@ -235,7 +155,6 @@
 
   .boot-inner {
     width: min(46ch, 88vw);
-    transition: opacity 0.14s ease-out;
   }
 
   .boot-log {

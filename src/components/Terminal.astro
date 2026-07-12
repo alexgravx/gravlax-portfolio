@@ -61,7 +61,7 @@ const initialPrompt = `visitor@${profile.handle}:~$`;
               neofetch.map(([k, v]) => (
                 <div class="nf-row">
                   <dt>{k}</dt>
-                  <dd>{v}</dd>
+                  <dd data-res={k === 'resolution' ? '' : undefined}>{v}</dd>
                 </div>
               ))
             }
@@ -112,6 +112,14 @@ const initialPrompt = `visitor@${profile.handle}:~$`;
     const shell = createShell();
     const history: string[] = [];
     let histIdx = 0;
+
+    // Real neofetch reports the display, so ours does too: the visitor's own
+    // screen, with the DPR suffix macOS-style (1512x982@2x).
+    const res = term.querySelector<HTMLElement>('[data-res]');
+    if (res) {
+      const dpr = Math.round(devicePixelRatio * 100) / 100;
+      res.textContent = `${screen.width}x${screen.height}${dpr !== 1 ? `@${dpr}x` : ''}`;
+    }
 
     /** Inverse-video block, sitting on the character at the caret. */
     function drawCursor() {
@@ -409,9 +417,20 @@ const initialPrompt = `visitor@${profile.handle}:~$`;
 
   @media (max-width: 640px) {
     .term-title,
-    .nf-art,
     .term-hint-scroll {
       display: none;
+    }
+
+    /* Keep the art on phones — it just stacks above the info instead of sitting
+       beside it. At ~24 columns the salmon still fits a 390px screen. */
+    .neofetch {
+      flex-direction: column;
+      align-items: center;
+      gap: var(--sp-4);
+    }
+
+    .nf-info {
+      align-self: stretch;
     }
   }
 </style>

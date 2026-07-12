@@ -253,7 +253,7 @@ const langColor: Record<string, string> = {
     display: flex;
     flex-direction: column;
     align-items: stretch;
-    gap: 1px;
+    gap: var(--sp-2);
     border-left: 2px solid var(--border);
     padding-left: var(--sp-3);
     position: sticky;
@@ -287,9 +287,9 @@ const langColor: Record<string, string> = {
        simon.lecoq.io. The hover fill then wipes chrome over it. */
     background: var(--rest);
     border: 0;
-    /* The thin rules above and below, which appear on hover in the fill colour. */
-    border-top: 1px solid transparent;
-    border-bottom: 1px solid transparent;
+    /* The rules above and below, which appear on hover in the fill colour. */
+    border-top: 2px solid transparent;
+    border-bottom: 2px solid transparent;
     padding: var(--sp-1) var(--sp-2);
     cursor: pointer;
     transition: color 0.32s ease-out, border-color 0.32s ease-out;
@@ -298,8 +298,8 @@ const langColor: Record<string, string> = {
   .fill {
     position: absolute;
     /* Inset vertically so the fill never touches the rules — that gap is what
-       makes them read as separate hairlines rather than a thick block. */
-    inset: 2px 0;
+       makes them read as separate rules rather than one thick block. */
+    inset: 3px 0;
     z-index: -1;
     background: var(--chrome);
     transform: scaleX(0);
