@@ -269,11 +269,11 @@ const initialPrompt = `visitor@${profile.handle}:~$`;
 
   /* ---------- prompt + block cursor ---------- */
 
+  /* No margin: the live prompt is just the next line of the shell. */
   .term-form {
     display: flex;
     align-items: baseline;
     gap: 1ch;
-    margin-top: var(--sp-1);
   }
 
   .term-field {
