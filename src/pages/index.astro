@@ -1,21 +1,27 @@
 ---
 import Base from '../layouts/Base.astro';
-import Banner from '../components/Banner.astro';
 import Terminal from '../components/Terminal.astro';
 import Projects from '../components/Projects.astro';
+import SkillsTree from '../components/SkillsTree.astro';
+import Contact from '../components/Contact.astro';
 import SectionHead from '../components/SectionHead.astro';
-import { profile, education, skills, experience, resumePdf } from '../content/resume';
+import { profile, education, experience } from '../content/resume';
 ---
 
 <Base>
+  {/* First screen: the terminal, and nothing else. */}
+  <section id="home" class="screen">
+    <Terminal />
+    <a class="scroll-cue" href="#about" aria-label="Scroll down">
+      <span aria-hidden="true">▾</span>
+    </a>
+  </section>
+
   <main class="wrap">
-    <section class="hero">
-      <Banner />
-      <p class="lede">{profile.title} · {profile.location}</p>
+    <section id="about">
+      <SectionHead cmd="cat about.md" label="about" />
       <p class="bio">{profile.bio}</p>
     </section>
-
-    <Terminal />
 
     <hr class="rule" />
 
@@ -60,19 +66,8 @@ import { profile, education, skills, experience, resumePdf } from '../content/re
     <hr class="rule" />
 
     <section id="skills">
-      <SectionHead cmd="cat skills.txt" label="skills" />
-      {
-        Object.entries(skills).map(([group, items]) => (
-          <div class="skill-row">
-            <strong class="skill-group">{group}</strong>
-            <ul class="tags">
-              {items.map((t) => (
-                <li>{t}</li>
-              ))}
-            </ul>
-          </div>
-        ))
-      }
+      <SectionHead cmd="tree skills/" label="skills" />
+      <SkillsTree />
     </section>
 
     <hr class="rule" />
@@ -99,62 +94,69 @@ import { profile, education, skills, experience, resumePdf } from '../content/re
     <hr class="rule" />
 
     <section id="contact">
-      <SectionHead cmd="contact" label="contact" />
-      <div class="entry">
-        {
-          profile.links.map((l) => (
-            <div>
-              <span class="comment">{l.label.padEnd(9)}</span>
-              <a href={l.href} target="_blank" rel="noopener noreferrer">
-                {l.href.replace(/^https?:\/\//, '')}
-              </a>
-            </div>
-          ))
-        }
-        <div>
-          <span class="comment">{'resume'.padEnd(9)}</span>
-          <a href="/resume">/resume</a> · <a href={resumePdf}>download .pdf</a>
-        </div>
-      </div>
+      <SectionHead cmd="contact --list" label="contact" />
+      <Contact />
     </section>
+
+    <hr class="rule" />
+
+    <p class="comment sign"># {profile.name} — built with Astro. No trackers, no cookies.</p>
   </main>
 </Base>
 
 <style>
-  .hero {
-    margin-bottom: var(--sp-6);
+  /* The terminal owns the first screen. Nothing else is above the fold. */
+  .screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--sp-4);
+    min-height: 100svh;
+    padding: var(--sp-5) var(--sp-4) var(--sp-6);
   }
 
-  .lede {
-    color: var(--dim);
-    margin-bottom: var(--sp-4);
+  .screen :global(.term) {
+    width: min(96ch, 100%);
+    height: min(30rem, 70svh);
   }
 
-  .bio {
-    margin-bottom: 0;
+  .scroll-cue {
+    color: var(--faint);
+    border: 0;
+    font-size: var(--step-1);
+    line-height: 1;
+    animation: nudge 1.8s ease-in-out infinite;
+  }
+
+  .scroll-cue:hover {
+    color: var(--accent);
+  }
+
+  @keyframes nudge {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(4px);
+    }
   }
 
   section[id] {
-    scroll-margin-top: 72px;
+    scroll-margin-top: var(--sp-5);
   }
 
-  .skill-row {
-    display: flex;
-    gap: var(--sp-3);
-    align-items: baseline;
-    flex-wrap: wrap;
-    margin-bottom: var(--sp-3);
-  }
-
-  .skill-group {
-    min-width: 11ch;
-  }
-
-  .skill-row .tags {
-    margin-top: 0;
+  .bio {
+    font-size: var(--step-1);
+    line-height: 1.7;
   }
 
   .entry p {
     margin: var(--sp-2) 0 0;
+  }
+
+  .sign {
+    margin: 0;
   }
 </style>

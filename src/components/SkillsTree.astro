@@ -1,0 +1,192 @@
+---
+import * as simpleIcons from 'simple-icons';
+import { skills } from '../content/resume';
+
+/**
+ * `tree skills/` — real branch glyphs, with each leaf carrying its brand logo.
+ * Logos are monochrome until hovered, then snap to the brand colour.
+ *
+ * simple-icons is a devDependency: the paths are inlined at build time, so the
+ * page makes no external requests and ships no icon runtime.
+ */
+
+type Icon = { path: string; hex: string };
+
+function icon(slug: string): Icon | null {
+  const key = 'si' + slug.charAt(0).toUpperCase() + slug.slice(1);
+  const found = (simpleIcons as unknown as Record<string, Icon>)[key];
+  return found ?? null;
+}
+
+/** Perceived luminance, 0–1. */
+function luminance(hex: string): number {
+  const [r, g, b] = [0, 2, 4].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255);
+  return 0.2126 * r! + 0.7152 * g! + 0.0722 * b!;
+}
+
+/** Some brand colours (Next.js #000, Express #0A0A0A, Pandas #150458) vanish on a
+    dark background. Lift those toward white so the hover colour is always visible. */
+function forDark(hex: string): string {
+  const l = luminance(hex);
+  if (l >= 0.3) return `#${hex}`;
+  const mix = Math.round((0.55 - l) * 160);
+  const lifted = [0, 2, 4]
+    .map((i) => Math.min(255, parseInt(hex.slice(i, i + 2), 16) + mix))
+    .map((v) => v.toString(16).padStart(2, '0'))
+    .join('');
+  return `#${lifted}`;
+}
+
+const groups = Object.entries(skills);
+---
+
+<div class="tree">
+  <div class="root">skills/</div>
+
+  {
+    groups.map(([group, items], gi) => {
+      const lastGroup = gi === groups.length - 1;
+      return (
+        <div class="group">
+          <div class="branch">
+            <span class="glyph">{lastGroup ? '└──' : '├──'}</span>
+            <span class="dir">{group}/</span>
+            <span class="count">{items.length}</span>
+          </div>
+
+          <ul class="leaves">
+            {items.map((skill, si) => {
+              const ic = skill.icon ? icon(skill.icon) : null;
+              const lastLeaf = si === items.length - 1;
+              return (
+                <li
+                  class="leaf"
+                  style={
+                    ic
+                      ? `--brand:#${ic.hex}; --brand-dark:${forDark(ic.hex)};`
+                      : undefined
+                  }
+                >
+                  <span class="glyph pipe">{lastGroup ? '   ' : '│'}</span>
+                  <span class="glyph">{lastLeaf ? '└──' : '├──'}</span>
+                  {ic ? (
+                    <svg class="logo" viewBox="0 0 24 24" aria-hidden="true">
+                      <path d={ic.path} />
+                    </svg>
+                  ) : (
+                    <span class="logo-fallback" aria-hidden="true">
+                      ■
+                    </span>
+                  )}
+                  <span class="name">{skill.name}</span>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      );
+    })
+  }
+</div>
+
+<style>
+  .tree {
+    font-size: var(--step--1);
+    line-height: 1.9;
+  }
+
+  .root {
+    color: var(--accent);
+    font-weight: 700;
+    margin-bottom: var(--sp-1);
+  }
+
+  .branch {
+    display: flex;
+    align-items: center;
+    gap: 0.8ch;
+  }
+
+  .glyph {
+    color: var(--faint);
+    white-space: pre;
+    user-select: none;
+  }
+
+  .dir {
+    color: var(--ink);
+    font-weight: 700;
+  }
+
+  .count {
+    color: var(--faint);
+    font-size: var(--step--2);
+  }
+
+  .count::before {
+    content: '(';
+  }
+
+  .count::after {
+    content: ')';
+  }
+
+  .leaves {
+    list-style: none;
+    margin: 0 0 var(--sp-2);
+    padding: 0;
+  }
+
+  .leaf {
+    display: flex;
+    align-items: center;
+    gap: 0.8ch;
+    width: fit-content;
+    padding-right: var(--sp-2);
+    border-radius: 3px;
+    transition: background 0.15s ease;
+  }
+
+  .pipe {
+    /* The vertical run of the parent branch, so leaves hang off it correctly. */
+    padding-right: 1.2ch;
+  }
+
+  .logo {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+    fill: var(--dim);
+    transition: fill 0.2s ease, transform 0.2s ease;
+  }
+
+  .logo-fallback {
+    width: 14px;
+    text-align: center;
+    color: var(--faint);
+    flex-shrink: 0;
+  }
+
+  .name {
+    color: var(--dim);
+    transition: color 0.2s ease;
+  }
+
+  /* Hover: the logo snaps to its brand colour and the row lights up. */
+  .leaf:hover {
+    background: var(--surface);
+  }
+
+  .leaf:hover .logo {
+    fill: var(--brand, var(--accent));
+    transform: scale(1.15);
+  }
+
+  .leaf:hover .name {
+    color: var(--ink);
+  }
+
+  :global(html[data-theme='dark']) .leaf:hover .logo {
+    fill: var(--brand-dark, var(--accent));
+  }
+</style>

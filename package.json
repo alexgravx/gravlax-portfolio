@@ -17,6 +17,7 @@
   "devDependencies": {
     "@astrojs/check": "^0.9.9",
     "@fontsource-variable/jetbrains-mono": "^5.2.8",
+    "simple-icons": "^16.26.0",
     "typescript": "^6.0.3"
   }
 }

@@ -1,0 +1,214 @@
+---
+/**
+ * Boot sequence.
+ *
+ * Like simon.lecoq.io, this logs REAL work: each line appears as an actual
+ * asset finishes loading, with a true elapsed-ms timestamp, and the progress
+ * bar tracks real completion — never a fake timer.
+ *
+ * Shown once per session, skippable with any key/click, and skipped entirely
+ * under prefers-reduced-motion.
+ */
+---
+
+<div id="boot" data-boot hidden>
+  <div class="boot-inner">
+    <pre class="boot-log" data-boot-log aria-hidden="true"></pre>
+    <div class="boot-bar">
+      <div class="boot-bar-fill" data-boot-bar></div>
+    </div>
+    <p class="boot-skip">press any key to skip</p>
+  </div>
+</div>
+
+<script>
+  const boot = document.querySelector<HTMLElement>('[data-boot]');
+
+  if (boot) {
+    const logEl = boot.querySelector<HTMLElement>('[data-boot-log]')!;
+    const barEl = boot.querySelector<HTMLElement>('[data-boot-bar]')!;
+
+    const seen = sessionStorage.getItem('booted') === '1';
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    if (seen || reduced) {
+      boot.remove();
+    } else {
+      document.documentElement.classList.add('booting');
+      boot.hidden = false;
+
+      const start = performance.now();
+      const stamp = () =>
+        `[${(performance.now() - start).toFixed(0).padStart(6)}]`.replace(/ /g, ' ');
+
+      // Real work: things the page genuinely needs before it is usable.
+      const steps: Array<{ label: string; work: () => Promise<unknown> }> = [
+        {
+          label: 'loading fonts/jetbrains-mono.woff2',
+          work: () => document.fonts.ready,
+        },
+        {
+          label: 'mounting /home/alexandre',
+          work: async () => {
+            const img = document.querySelector('link[rel="icon"]') as HTMLLinkElement | null;
+            if (img?.href) await fetch(img.href, { cache: 'force-cache' }).catch(() => {});
+          },
+        },
+        {
+          label: 'starting terminal.service',
+          work: async () => {
+            // Wait for the terminal's hydration script to have wired itself up.
+            while (!document.querySelector('[data-term] [data-cursor]')) {
+              await new Promise((r) => requestAnimationFrame(r));
+            }
+          },
+        },
+        {
+          label: 'indexing projects.db',
+          work: async () => {
+            while (!document.querySelector('[data-projects] .card')) {
+              await new Promise((r) => requestAnimationFrame(r));
+            }
+          },
+        },
+        {
+          label: 'ready',
+          work: async () => {},
+        },
+      ];
+
+      const lines: string[] = [];
+      let done = 0;
+
+      function write(text: string) {
+        lines.push(`${stamp()} ${text}`);
+        // Newest at the bottom; older lines fade out via CSS nth-last-child.
+        logEl.innerHTML = lines
+          .slice(-7)
+          .map((l) => `<span>${l}</span>`)
+          .join('\n');
+      }
+
+      async function finish() {
+        if (!boot || boot.dataset.done) return;
+        boot.dataset.done = '1';
+        sessionStorage.setItem('booted', '1');
+        boot.classList.add('out');
+        document.documentElement.classList.remove('booting');
+        boot.addEventListener('transitionend', () => boot.remove(), { once: true });
+        setTimeout(() => boot.remove(), 800);
+      }
+
+      addEventListener('keydown', finish, { once: true });
+      boot.addEventListener('click', finish, { once: true });
+
+      (async () => {
+        // The work below is real, but on a static site it finishes in ~3ms —
+        // faster than anyone can read. So each line is held for a minimum beat:
+        // the completion is genuine, only the *reveal* is paced.
+        const BEAT = 150;
+
+        for (const step of steps) {
+          const at = performance.now();
+          write(step.label);
+          await step.work();
+          const remaining = BEAT - (performance.now() - at);
+          if (remaining > 0) await new Promise((r) => setTimeout(r, remaining));
+
+          done += 1;
+          barEl.style.width = `${(done / steps.length) * 100}%`;
+        }
+
+        await new Promise((r) => setTimeout(r, 220));
+        finish();
+      })();
+    }
+  }
+</script>
+
+<style is:global>
+  /* Freeze the page behind the boot screen. */
+  html.booting,
+  html.booting body {
+    overflow: hidden;
+  }
+</style>
+
+<style>
+  #boot {
+    position: fixed;
+    inset: 0;
+    z-index: 900;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg);
+    transition: opacity 0.45s ease-out;
+  }
+
+  #boot.out {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .boot-inner {
+    width: min(46ch, 88vw);
+  }
+
+  .boot-log {
+    margin: 0 0 var(--sp-3);
+    height: 9.5em;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    font-size: var(--step--1);
+    line-height: 1.35;
+    color: var(--ink);
+    white-space: pre;
+    overflow: hidden;
+  }
+
+  /* Older lines recede, exactly as they do on simon.lecoq.io. */
+  .boot-log :global(span) {
+    opacity: 1;
+  }
+  .boot-log :global(span:nth-last-child(2)) {
+    opacity: 0.75;
+  }
+  .boot-log :global(span:nth-last-child(3)) {
+    opacity: 0.55;
+  }
+  .boot-log :global(span:nth-last-child(4)) {
+    opacity: 0.38;
+  }
+  .boot-log :global(span:nth-last-child(5)) {
+    opacity: 0.24;
+  }
+  .boot-log :global(span:nth-last-child(6)) {
+    opacity: 0.14;
+  }
+  .boot-log :global(span:nth-last-child(n + 7)) {
+    opacity: 0.07;
+  }
+
+  .boot-bar {
+    height: 5px;
+    padding: 1px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+  }
+
+  .boot-bar-fill {
+    height: 100%;
+    width: 0;
+    background: var(--accent);
+    transition: width 0.18s ease-out;
+  }
+
+  .boot-skip {
+    margin: var(--sp-2) 0 0;
+    color: var(--faint);
+    font-size: var(--step--2);
+    text-align: right;
+  }
+</style>

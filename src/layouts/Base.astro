@@ -1,6 +1,7 @@
 ---
 import '../styles/theme.css';
-import ThemeToggle from '../components/ThemeToggle.astro';
+import StatusBar from '../components/StatusBar.astro';
+import Loader from '../components/Loader.astro';
 import { profile } from '../content/resume';
 
 interface Props {
@@ -43,88 +44,24 @@ const {
     </script>
   </head>
   <body>
+    <Loader />
     <div class="screen-mesh"></div>
-
-    <header class="topbar">
-      <a class="brand" href="/">{profile.handle}<span class="blink">_</span></a>
-      <nav class="topnav">
-        <a href="/#projects">projects</a>
-        <a href="/#experience">experience</a>
-        <a href="/resume">resume</a>
-        <ThemeToggle />
-      </nav>
-    </header>
 
     <slot />
 
-    <footer class="foot">
-      <span class="comment"># {profile.name} — built with Astro. No trackers, no cookies.</span>
-      <span class="links">
-        {
-          profile.links.map((l) => (
-            <a href={l.href} target="_blank" rel="noopener noreferrer">
-              {l.label}
-            </a>
-          ))
-        }
-      </span>
-    </footer>
+    <StatusBar />
 
-    <style>
-      .topbar {
-        position: sticky;
-        top: 0;
-        z-index: 400;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: var(--sp-4);
-        padding: var(--sp-3) var(--sp-4);
-        background: color-mix(in srgb, var(--bg) 88%, transparent);
-        backdrop-filter: blur(8px);
-        border-bottom: 1px solid var(--border);
-      }
-
-      .brand {
-        color: var(--ink);
-        font-weight: 700;
-        border: 0;
-      }
-
-      .brand:hover {
-        color: var(--accent);
-      }
-
-      .topnav {
-        display: flex;
-        align-items: center;
-        gap: var(--sp-4);
-        font-size: var(--step--1);
-      }
-
-      .foot {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        flex-wrap: wrap;
-        gap: var(--sp-3);
-        max-width: 84ch;
-        margin: 0 auto;
-        padding: var(--sp-5) var(--sp-4) var(--sp-7);
-        border-top: 1px dashed var(--border);
-        font-size: var(--step--1);
-      }
-
-      .foot .links {
-        display: flex;
-        gap: var(--sp-4);
-      }
-
-      @media (max-width: 560px) {
-        .topnav {
-          gap: var(--sp-3);
-        }
-      }
-    </style>
+    <script>
+      import { initScramble, initCursor } from '../scripts/effects';
+      initScramble();
+      initCursor();
+    </script>
   </body>
 </html>
+
+<style is:global>
+  /* Keep content clear of the fixed tmux status line. */
+  body {
+    padding-bottom: 32px;
+  }
+</style>

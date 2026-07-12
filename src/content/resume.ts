@@ -116,45 +116,56 @@ export const education: Education[] = [
       'Web Data Intelligence',
     ],
   },
-  {
-    school: 'Collège Stanislas',
-    degree: 'Classes préparatoires — Math, CS, Physics',
-    location: 'Paris, France',
-    date: '2020 — 2022',
-    summary:
-      'Two years of intensive preparation for the entrance exams to the French Grandes Écoles.',
-    coursework: [
-      'Intensive preparation for the highly competitive entrance exams to the French Grandes Écoles',
-    ],
-  },
 ];
 
-export const skills = {
-  Languages: ['Python', 'JavaScript', 'TypeScript', 'Java', 'Go', 'Swift'],
-  DevOps: [
-    'Docker',
-    'Kubernetes',
-    'Nginx',
-    'GitLab CI/CD',
-    'Terraform',
-    'Ansible',
-    'IaC',
-    'bash',
-    'sysadmin',
+export interface Skill {
+  name: string;
+  /** simple-icons slug. Omitted where no brand mark exists (bash concepts, IaC…). */
+  icon?: string;
+}
+
+export const skills: Record<string, Skill[]> = {
+  languages: [
+    { name: 'Python', icon: 'python' },
+    { name: 'JavaScript', icon: 'javascript' },
+    { name: 'TypeScript', icon: 'typescript' },
+    { name: 'Java', icon: 'openjdk' },
+    { name: 'Go', icon: 'go' },
+    { name: 'Swift', icon: 'swift' },
   ],
-  'Data & ML': [
-    'Pandas',
-    'scikit-learn',
-    'PyTorch',
-    'LangChain',
-    'TGI',
-    'Celery',
-    'PostgreSQL',
-    'MongoDB',
-    'Spark',
+  devops: [
+    { name: 'Docker', icon: 'docker' },
+    { name: 'Kubernetes', icon: 'kubernetes' },
+    { name: 'Nginx', icon: 'nginx' },
+    { name: 'GitLab CI/CD', icon: 'gitlab' },
+    { name: 'Terraform', icon: 'terraform' },
+    { name: 'Ansible', icon: 'ansible' },
+    { name: 'bash', icon: 'gnubash' },
   ],
-  Fullstack: ['Node.js', 'Express', 'React', 'Vue', 'Next.js', 'FastAPI'],
-} satisfies Record<string, string[]>;
+  'data-ml': [
+    { name: 'Pandas', icon: 'pandas' },
+    { name: 'scikit-learn', icon: 'scikitlearn' },
+    { name: 'PyTorch', icon: 'pytorch' },
+    { name: 'LangChain', icon: 'langchain' },
+    { name: 'Celery', icon: 'celery' },
+    { name: 'PostgreSQL', icon: 'postgresql' },
+    { name: 'MongoDB', icon: 'mongodb' },
+    { name: 'Spark', icon: 'apachespark' },
+  ],
+  fullstack: [
+    { name: 'Node.js', icon: 'nodedotjs' },
+    { name: 'Express', icon: 'express' },
+    { name: 'React', icon: 'react' },
+    { name: 'Vue', icon: 'vuedotjs' },
+    { name: 'Next.js', icon: 'nextdotjs' },
+    { name: 'FastAPI', icon: 'fastapi' },
+  ],
+};
+
+/** Flat list for the resume, which just wants comma-separated names. */
+export const skillNames: Record<string, string[]> = Object.fromEntries(
+  Object.entries(skills).map(([group, items]) => [group, items.map((s) => s.name)]),
+);
 
 export const experience: Role[] = [
   {

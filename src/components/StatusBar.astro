@@ -1,0 +1,167 @@
+---
+import ThemeToggle from './ThemeToggle.astro';
+import { profile } from '../content/resume';
+
+/**
+ * Navigation as a tmux status line, pinned to the bottom of the viewport.
+ * Windows are numbered like tmux; the active one is highlighted by scroll-spy.
+ */
+const windows = [
+  { id: 'home', label: 'home' },
+  { id: 'projects', label: 'projects' },
+  { id: 'experience', label: 'experience' },
+  { id: 'skills', label: 'skills' },
+  { id: 'education', label: 'education' },
+  { id: 'contact', label: 'contact' },
+];
+---
+
+<nav class="status" aria-label="Sections">
+  <span class="session" aria-hidden="true">[{profile.handle}]</span>
+
+  <ul class="windows">
+    {
+      windows.map((w, i) => (
+        <li>
+          <a href={`#${w.id}`} class="win" data-win={w.id}>
+            <span class="idx">{i}</span>:<span class="label">{w.label}</span>
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+
+  <span class="right">
+    <a class="win extra" href="/resume">resume</a>
+    <time class="clock" data-clock aria-hidden="true">--:--</time>
+    <ThemeToggle />
+  </span>
+</nav>
+
+<script>
+  // Clock
+  const clock = document.querySelector<HTMLElement>('[data-clock]');
+  function tick() {
+    if (!clock) return;
+    clock.textContent = new Date().toLocaleTimeString([], {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    });
+  }
+  tick();
+  setInterval(tick, 15_000);
+
+  // Scroll-spy: highlight the window whose section is currently in view.
+  const wins = document.querySelectorAll<HTMLElement>('[data-win]');
+  const targets = [...wins]
+    .map((w) => document.getElementById(w.dataset.win!))
+    .filter((el): el is HTMLElement => Boolean(el));
+
+  function setActive(id: string) {
+    wins.forEach((w) => w.classList.toggle('active', w.dataset.win === id));
+  }
+
+  const spy = new IntersectionObserver(
+    (entries) => {
+      const visible = entries
+        .filter((e) => e.isIntersecting)
+        .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+      if (visible) setActive(visible.target.id);
+    },
+    // Bias toward the upper half of the viewport so the "current" section is
+    // the one being read, not the one just scrolling into the bottom edge.
+    { rootMargin: '-10% 0px -55% 0px', threshold: [0.05, 0.25, 0.5] },
+  );
+
+  targets.forEach((t) => spy.observe(t));
+</script>
+
+<style>
+  .status {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 450;
+    display: flex;
+    align-items: center;
+    gap: var(--sp-2);
+    padding: 3px var(--sp-2);
+    background: var(--raised);
+    border-top: 1px solid var(--border);
+    font-size: var(--step--2);
+    line-height: 1.9;
+  }
+
+  .session {
+    color: var(--accent-ink);
+    background: var(--accent);
+    font-weight: 700;
+    padding: 0 var(--sp-2);
+    flex-shrink: 0;
+  }
+
+  .windows {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-1);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    min-width: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .windows::-webkit-scrollbar {
+    display: none;
+  }
+
+  .win {
+    display: block;
+    color: var(--dim);
+    border: 0;
+    padding: 0 var(--sp-2);
+    white-space: nowrap;
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+
+  .win:hover {
+    color: var(--ink);
+    background: var(--surface);
+    border: 0;
+  }
+
+  /* tmux marks the active window with a reversed block. */
+  .win.active {
+    color: var(--accent-ink);
+    background: var(--accent);
+    font-weight: 700;
+  }
+
+  .idx {
+    opacity: 0.7;
+  }
+
+  .right {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-2);
+    margin-left: auto;
+    flex-shrink: 0;
+  }
+
+  .clock {
+    color: var(--faint);
+    font-variant-numeric: tabular-nums;
+  }
+
+  @media (max-width: 720px) {
+    .session,
+    .clock,
+    .extra {
+      display: none;
+    }
+  }
+</style>

@@ -1,6 +1,6 @@
 ---
 import '../styles/theme.css';
-import { profile, education, skills, experience, projects, resumePdf } from '../content/resume';
+import { profile, education, skillNames, experience, projects, resumePdf } from '../content/resume';
 
 // The resume shows the two projects the PDF actually lists; the rest live on the portfolio.
 const listed = projects.filter((p) => p.onResume);
@@ -73,7 +73,7 @@ const listed = projects.filter((p) => p.onResume);
       <section>
         <h2>Technical Skills</h2>
         {
-          Object.entries(skills).map(([group, items]) => (
+          Object.entries(skillNames).map(([group, items]) => (
             <p class="skill">
               <strong>{group}:</strong> {items.join(', ')}
             </p>

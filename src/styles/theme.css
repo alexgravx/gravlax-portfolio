@@ -170,6 +170,53 @@ p:last-child {
   padding: var(--sp-6) var(--sp-4) var(--sp-8);
 }
 
+/* ---------------------------------------------------------------
+   Custom cursor — a terminal block that follows the pointer.
+   Only mounted on fine pointers, and never under reduced motion.
+   --------------------------------------------------------------- */
+
+.cursor-block {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 800;
+  width: 9px;
+  height: 18px;
+  margin: -9px 0 0 -4px;
+  background: var(--accent);
+  opacity: 0.9;
+  pointer-events: none;
+  mix-blend-mode: difference;
+  transition: width 0.16s ease, height 0.16s ease, opacity 0.16s ease, margin 0.16s ease;
+}
+
+.cursor-block.on-target {
+  width: 22px;
+  height: 22px;
+  margin: -11px 0 0 -11px;
+  opacity: 0.75;
+}
+
+.cursor-block.down {
+  opacity: 1;
+  transform-origin: center;
+  width: 7px;
+  height: 14px;
+}
+
+.cursor-block.gone {
+  opacity: 0;
+}
+
+/* Hide the OS cursor only once ours is actually mounted, so a failed script
+   never leaves the visitor with no cursor at all. */
+html.has-custom-cursor,
+html.has-custom-cursor a,
+html.has-custom-cursor button,
+html.has-custom-cursor input {
+  cursor: none;
+}
+
 /* Break a section out of the reading column — used by the projects browser,
    which needs more room than a 72ch measure allows. */
 .bleed {

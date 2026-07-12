@@ -1,7 +1,7 @@
 import {
   profile,
   education,
-  skills,
+  skillNames,
   experience,
   projects,
   resumePdf,
@@ -81,7 +81,7 @@ const registry: Command[] = [
     name: 'skills',
     summary: 'what he knows',
     run: () =>
-      Object.entries(skills)
+      Object.entries(skillNames)
         .map(
           ([group, items]) =>
             `<div class="entry compact"><strong>${esc(group)}</strong>${tags(items)}</div>`,
