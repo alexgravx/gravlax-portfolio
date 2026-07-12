@@ -352,10 +352,12 @@ const initialPrompt = `visitor@${profile.handle}:~$`;
     gap: 1ch;
   }
 
+  /* Wide enough for the longest key ("resolution", 10 chars), so every value
+     starts in the same column. */
   .nf-row dt {
     color: var(--accent);
     font-weight: 700;
-    min-width: 9ch;
+    min-width: 10ch;
   }
 
   .nf-row dd {
@@ -415,14 +417,9 @@ const initialPrompt = `visitor@${profile.handle}:~$`;
     animation: none;
   }
 
-  @media (max-width: 640px) {
-    .term-title,
-    .term-hint-scroll {
-      display: none;
-    }
-
-    /* Keep the art on phones — it just stacks above the info instead of sitting
-       beside it. At ~24 columns the salmon still fits a 390px screen. */
+  /* Medium screens: keep both the monogram and the salmon, but stack the art
+     above the info rather than beside it. */
+  @media (max-width: 860px) {
     .neofetch {
       flex-direction: column;
       align-items: center;
@@ -431,6 +428,16 @@ const initialPrompt = `visitor@${profile.handle}:~$`;
 
     .nf-info {
       align-self: stretch;
+    }
+  }
+
+  /* Phones: the salmon alone. The monogram is 17 columns of heavy block glyphs
+     and, stacked on top of the fish, eats most of the screen. */
+  @media (max-width: 640px) {
+    .term-title,
+    .term-hint-scroll,
+    .nf-mono {
+      display: none;
     }
   }
 </style>

@@ -452,7 +452,7 @@ export const neofetch: Array<[string, string]> = [
   // Filled in at runtime from the visitor's actual screen — the placeholder is
   // what non-JS visitors see.
   ['resolution', '—'],
-  ['theme', 'gravlax'],
+  ['terminal', 'gravlax 24.5.1'],
 ];
 
 /** Windows listed in the tmux status bar. `id` must match a section id on the page. */
