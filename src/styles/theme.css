@@ -334,8 +334,11 @@ html.has-custom-cursor input {
   white-space: pre-wrap;
 }
 
+/* No margin at all: a shell just stacks lines. Output sits directly under the
+   command, and the next prompt directly under the output — so the spacing is
+   the plain line-height, exactly as when Enter is pressed on an empty line. */
 .term-out {
-  margin: var(--sp-2) 0 var(--sp-3);
+  margin: 0;
 }
 
 .term-block {
